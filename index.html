@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lucas Cashwell · AI Projects</title>
+<meta name="description" content="Documenting what I've learned through building with AI." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════ BRAND TOKENS ══════════════════════ */
+:root {
+  --space-base:   #07060B;
+  --space-deep:   #120C24;
+  --space-purple: #2A1B45;
+  --glow-gold:    rgba(202,183,125,0.16);
+  --glow-purple:  rgba(120,80,165,0.22);
+
+  --gold-shadow:  #957C51;
+  --gold-mid:     #B09D6B;
+  --gold-hi:      #CAB77D;
+  --gold-accent:  #DDB947;
+
+  --glass-bg:     rgba(255,255,255,0.055);
+  --glass-bg-s:   rgba(255,255,255,0.09);
+  --glass-gold:   rgba(176,157,107,0.07);
+  --glass-bd:     rgba(255,255,255,0.13);
+  --glass-edge:   rgba(255,255,255,0.28);
+  --glass-shadow: 0 8px 40px rgba(0,0,0,.45);
+
+  --ink:          #F4F1E8;
+  --ink-muted:    #B9B2A4;
+  --ink-faint:    #6A6459;
+
+  --r: 20px;
+  --maxw: 960px;
+  --serif: "Fraunces", Georgia, serif;
+  --sans:  "Inter", system-ui, sans-serif;
+}
+
+/* ══════════════════════ GOLD METAL (animated specular sweep) ══════════════════════ */
+.gold-metal {
+  background: linear-gradient(135deg, #957C51 0%, #CAB77D 42%, #B09D6B 68%, #957C51 100%);
+  background-size: 200% 200%;
+  position: relative; overflow: hidden;
+}
+.gold-metal::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.42) 50%, transparent 60%);
+  transform: translateX(-120%);
+  animation: sweep 5.5s ease-in-out infinite;
+}
+@keyframes sweep { 0%,100%{transform:translateX(-120%)} 55%{transform:translateX(120%)} }
+
+.gold-text {
+  background: linear-gradient(135deg, #957C51, #CAB77D, #B09D6B);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* ══════════════════════ GLASS ══════════════════════ */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-edge);
+  border-radius: var(--r);
+}
+
+/* ══════════════════════ RESET ══════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans); color: var(--ink); line-height: 1.65;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  background:
+    radial-gradient(60% 50% at 70% 20%, var(--glow-gold) 0%, transparent 60%),
+    radial-gradient(70% 60% at 25% 80%, var(--glow-purple) 0%, transparent 65%),
+    linear-gradient(160deg, var(--space-base) 0%, var(--space-deep) 60%, var(--space-purple) 100%);
+  min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
+h1,h2,h3,h4 { font-family: var(--serif); line-height: 1.1; }
+img { display: block; max-width: 100%; }
+
+canvas#stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.layer { position: relative; z-index: 1; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+.eyebrow {
+  display: block; font-family: var(--sans); font-size: .7rem; font-weight: 600;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--gold-hi); margin-bottom: 14px;
+}
+
+/* ══════════════════════ FADE-IN ANIMATION ══════════════════════ */
+.fade-up { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+.fade-up.visible { opacity: 1; transform: none; }
+.fade-up:nth-child(2){transition-delay:.1s} .fade-up:nth-child(3){transition-delay:.2s} .fade-up:nth-child(4){transition-delay:.3s}
+@media (prefers-reduced-motion:reduce) {
+  .fade-up { opacity:1; transform:none; transition:none; }
+  .gold-metal::after { animation:none; opacity:.22; }
+}
+
+/* ══════════════════════ NAV ══════════════════════ */
+nav {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(20px) saturate(130%); -webkit-backdrop-filter: blur(20px) saturate(130%);
+  background: rgba(7,6,11,.7); border-bottom: 1px solid rgba(255,255,255,.09);
+}
+nav .wrap { display:flex; align-items:center; justify-content:space-between; height:56px; gap:16px; }
+.brand { font-family:var(--serif); font-weight:500; font-size:1.05rem; letter-spacing:.01em; }
+.brand .dot { color:var(--gold-mid); }
+.nav-links { display:flex; gap:4px; }
+.nav-links a { font-size:.82rem; color:var(--ink-muted); padding:6px 12px; border-radius:999px; transition:.18s; }
+.nav-links a:hover { color:var(--ink); background:rgba(255,255,255,.06); }
+.nav-cta {
+  font-size:.83rem; color:var(--gold-hi); border:1px solid rgba(176,157,107,.32);
+  padding:7px 16px; border-radius:999px; transition:.2s;
+}
+.nav-cta:hover { background:rgba(176,157,107,.1); }
+
+/* ══════════════════════ HERO ══════════════════════ */
+header.hero { padding: 100px 0 0; text-align: center; overflow: hidden; }
+header.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 400; letter-spacing: -.025em;
+  max-width: 700px; margin: 0 auto; color: var(--ink);
+}
+header.hero h1 em { font-style: italic; color: var(--gold-hi); }
+.hero-sub {
+  font-family: var(--serif); font-weight: 300; font-style: italic;
+  font-size: clamp(1rem, 2.2vw, 1.2rem); color: var(--ink-muted);
+  margin: 18px auto 0; max-width: 500px; line-height: 1.7;
+}
+.hero-btn-row { display:flex; gap:12px; justify-content:center; margin-top:32px; flex-wrap:wrap; }
+
+.btn-primary {
+  display: inline-flex; align-items: center;
+  padding: 13px 26px; border-radius: 999px;
+  font-weight: 600; font-size: .9rem; color: #1a1406;
+  box-shadow: 0 6px 28px rgba(149,124,81,.32); transition: transform .2s, box-shadow .2s;
+}
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 12px 36px rgba(149,124,81,.44); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 12px 22px; border-radius: 999px;
+  border: 1px solid rgba(176,157,107,.28); color: var(--ink-muted); font-size: .9rem; transition:.2s;
+}
+.btn-ghost:hover { border-color:var(--gold-mid); color:var(--ink); background:rgba(176,157,107,.07); }
+
+/* ══════════════════════ PROJECT CAROUSEL (hero showcase) ══════════════════════ */
+.carousel-wrap {
+  margin-top: 52px; padding-bottom: 52px;
+  overflow: hidden; position: relative;
+}
+.carousel-wrap::before, .carousel-wrap::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2; pointer-events: none;
+}
+.carousel-wrap::before { left: 0; background: linear-gradient(to right, var(--space-base), transparent); }
+.carousel-wrap::after  { right: 0; background: linear-gradient(to left, var(--space-base), transparent); }
+
+.carousel-track {
+  display: flex; gap: 18px;
+  width: max-content;
+  animation: marquee 36s linear infinite;
+}
+.carousel-track:hover { animation-play-state: paused; }
+@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+.carousel-card {
+  width: 300px; flex-shrink: 0; padding: 20px;
+  display: flex; flex-direction: column; gap: 10px;
+  border-radius: 16px; cursor: default;
+  transition: transform .25s, border-color .25s;
+}
+.carousel-card:hover { transform: translateY(-4px); border-color: rgba(176,157,107,.4) !important; }
+.carousel-card .c-tag {
+  font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold-hi); font-family: var(--sans);
+}
+.carousel-card h4 { font-family: var(--serif); font-size: 1.05rem; font-weight: 500; color: var(--ink); }
+.carousel-card p  { font-size: .8rem; color: var(--ink-muted); line-height: 1.55; }
+.carousel-card .c-chips { display:flex; gap:5px; flex-wrap:wrap; margin-top:4px; }
+.carousel-card .c-chip {
+  font-size: .66rem; color: var(--ink-faint);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 999px; padding: 3px 8px;
+}
+
+/* ══════════════════════ SECTIONS ══════════════════════ */
+section { padding: 72px 0; border-top: 1px solid rgba(255,255,255,.055); }
+section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400; margin-bottom: 10px; }
+.section-intro { color: var(--ink-muted); max-width: 600px; margin-bottom: 44px; font-size: .96rem; }
+
+/* ══════════════════════ BADGE ══════════════════════ */
+.badge { display:inline-flex; align-items:center; gap:5px; font-size:.68rem; font-weight:600; font-family:var(--sans); letter-spacing:.07em; text-transform:uppercase; padding:4px 11px; border-radius:999px; }
+.badge-live  { background:rgba(52,201,123,.1);  color:#34c97b; border:1px solid rgba(52,201,123,.28); }
+.badge-pub   { background:rgba(100,153,255,.1);  color:#7aaaff; border:1px solid rgba(100,153,255,.28); }
+.badge-wip   { background:rgba(176,157,107,.1);  color:var(--gold-hi); border:1px solid rgba(176,157,107,.28); }
+.badge-proto { background:rgba(160,140,100,.08); color:var(--ink-muted); border:1px solid rgba(176,157,107,.2); }
+
+/* ══════════════════════ PROJECT CARDS ══════════════════════ */
+.proj-card {
+  padding: 28px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 16px;
+  transition: border-color .22s, transform .22s, box-shadow .22s;
+}
+.proj-card:hover { border-color:rgba(176,157,107,.38); transform:translateY(-2px); box-shadow:0 18px 52px rgba(0,0,0,.5), inset 0 1px 0 rgba(202,183,125,.12); }
+.proj-header { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.proj-header h3 { font-family:var(--serif); font-size:1.4rem; font-weight:400; }
+.proj-desc { color:var(--ink-muted); font-size:.94rem; line-height:1.7; }
+.proj-points { list-style:none; display:flex; flex-direction:column; gap:9px; }
+.proj-points li { position:relative; padding-left:22px; color:var(--ink-muted); font-size:.88rem; }
+.proj-points li::before { content:""; position:absolute; left:0; top:.65em; width:7px; height:7px; border-radius:1.5px; background:linear-gradient(135deg,#957C51,#CAB77D); transform:rotate(45deg); }
+.proj-points li strong { color:var(--ink); font-weight:500; }
+.chips { display:flex; flex-wrap:wrap; gap:7px; }
+.chip { font-size:.72rem; color:var(--ink-muted); background:rgba(176,157,107,.07); border:1px solid rgba(176,157,107,.2); border-radius:999px; padding:4px 11px; }
+.proj-links { display:flex; gap:8px; flex-wrap:wrap; }
+.proj-link { display:inline-flex; align-items:center; gap:5px; font-size:.8rem; font-weight:500; color:var(--gold-mid); border:1px solid rgba(176,157,107,.28); padding:7px 15px; border-radius:999px; transition:.18s; }
+.proj-link:hover { background:rgba(176,157,107,.1); color:var(--gold-hi); }
+
+/* ══════════════════════ BTC APP MOCKUPS ══════════════════════ */
+.app-tabs { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+.app-tab {
+  font-size:.78rem; font-weight:500; padding:8px 16px; border-radius:999px; cursor:pointer;
+  border:1px solid rgba(176,157,107,.22); color:var(--ink-muted); transition:.18s; font-family:var(--sans);
+  background: none;
+}
+.app-tab:hover { color:var(--ink); border-color:rgba(176,157,107,.5); }
+.app-tab.active { background:rgba(176,157,107,.14); border-color:rgba(176,157,107,.5); color:var(--gold-hi); }
+
+.mockup-panel { display:none; }
+.mockup-panel.active { display:block; }
+
+/* Mockup chrome */
+.app-chrome {
+  background:#060608; border:1px solid #1a1a2e; border-radius:14px; overflow:hidden;
+  font-family:'Inter',monospace; font-size:12px;
+}
+.app-titlebar {
+  background:#0a0a10; border-bottom:1px solid #1a1a2e; padding:10px 16px;
+  display:flex; align-items:center; gap:10px;
+}
+.app-titlebar .dots { display:flex; gap:5px; }
+.app-titlebar .dot-r { width:10px; height:10px; border-radius:50%; background:#ff5f56; }
+.app-titlebar .dot-y { width:10px; height:10px; border-radius:50%; background:#febc2e; }
+.app-titlebar .dot-g { width:10px; height:10px; border-radius:50%; background:#27c840; }
+.app-titlebar .title { font-size:11px; color:#556; letter-spacing:.06em; margin-left:6px; }
+.app-body { padding:16px; }
+
+/* KPI card grid */
+.kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+@media(max-width:600px){ .kpi-grid{grid-template-columns:1fr 1fr;} }
+.kpi-card { background:#0d0d1a; border:1px solid #1e1e38; border-radius:9px; padding:13px 14px; }
+.kpi-label { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#4455aa; margin-bottom:5px; }
+.kpi-val { font-family:'Inter',monospace; font-size:1.4rem; font-weight:600; color:#f7931a; line-height:1; }
+.kpi-val.green { color:#00e676; }
+.kpi-val.blue  { color:#7aaaff; }
+.kpi-val.red   { color:#ff5252; }
+.kpi-sub { font-size:9px; color:#445; margin-top:4px; }
+
+/* Mini table */
+.mini-table { width:100%; border-collapse:collapse; font-size:10px; margin-top:4px; }
+.mini-table th { color:#4455aa; text-align:left; padding:5px 8px; border-bottom:1px solid #1a1a2e; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+.mini-table td { padding:6px 8px; color:#aab; border-bottom:1px solid #12122a; }
+.mini-table tr:last-child td { border-bottom:none; }
+.mini-table .btc { color:#f7931a; font-weight:600; }
+.mini-table .pos { color:#00e676; }
+.mini-table .neg { color:#ff5252; }
+
+/* Bar chart */
+.bar-chart { display:flex; flex-direction:column; gap:6px; }
+.bar-row { display:flex; align-items:center; gap:8px; font-size:10px; }
+.bar-label { width:42px; text-align:right; color:#889; flex-shrink:0; }
+.bar-track { flex:1; height:14px; background:#0d0d1a; border-radius:3px; overflow:hidden; position:relative; }
+.bar-fill  { height:100%; border-radius:3px; background:linear-gradient(90deg,#f7931a,#fbb040); transition:width .4s ease; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; }
+.bar-fill.blue { background:linear-gradient(90deg,#4466ff,#6699ff); }
+.bar-fill.green{ background:linear-gradient(90deg,#00b050,#00e676); }
+.bar-val  { font-size:9px; color:#fff; font-weight:700; white-space:nowrap; }
+.bar-score-label { width:28px; color:#556; font-size:9px; flex-shrink:0; }
+
+/* Mini chart (SVG sparkline area) */
+.mini-chart { margin-top:10px; }
+
+/* Slider row */
+.slider-group { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.slider-row { display:flex; align-items:center; gap:10px; font-size:10px; }
+.slider-name { width:140px; color:#889; flex-shrink:0; }
+.slider-track { flex:1; height:5px; background:#1a1a2e; border-radius:3px; position:relative; }
+.slider-fill  { height:100%; border-radius:3px; background:linear-gradient(90deg,#f7931a,#fbb040); }
+.slider-val   { width:55px; text-align:right; color:#f7931a; font-weight:600; flex-shrink:0; }
+
+/* Score bar — adoption tracker */
+.score-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.score-card { background:#0c0c14; border:1px solid #1c1c38; border-radius:8px; padding:11px 13px; }
+.score-ticker { font-size:10px; font-weight:700; color:#c0c8ff; margin-bottom:2px; }
+.score-name   { font-size:9px; color:#445; margin-bottom:6px; }
+.score-bar-track { height:7px; background:#12122a; border-radius:3px; overflow:hidden; margin-bottom:4px; }
+.score-bar-fill  { height:100%; border-radius:3px; }
+.score-number { font-size:.9rem; font-weight:700; color:#f7931a; float:right; margin-top:-18px; font-family:'Inter',monospace; }
+.adopted-badge { display:inline-block; font-size:8px; color:#00e676; border:1px solid rgba(0,230,118,.3); border-radius:999px; padding:1px 6px; margin-bottom:4px; }
+
+/* Activist letter box */
+.letter-preview {
+  background:#080810; border:1px solid #1a1a2e; border-radius:8px; padding:14px 16px;
+  font-size:10px; color:#778; line-height:1.6; margin-top:10px;
+  max-height:130px; overflow:hidden; position:relative;
+}
+.letter-preview::after { content:""; position:absolute; bottom:0; left:0; right:0; height:40px; background:linear-gradient(transparent,#080810); }
+.letter-preview .ltr-company { color:#c0c8ff; font-weight:700; font-size:11px; }
+.letter-preview .ltr-btc { color:#f7931a; font-weight:600; }
+
+/* ══════════════════════ BACKGROUND / BIO ══════════════════════ */
+.bio {
+  font-family: var(--serif); font-weight: 300; font-size: 1.12rem;
+  line-height: 1.85; color: var(--ink); padding: 36px 38px;
+}
+.bio em { font-style: italic; color: var(--gold-hi); }
+
+/* ══════════════════════ CONTACT ══════════════════════ */
+.contact-center { text-align: center; }
+.contact-center h2 { margin-bottom: 8px; }
+.contact-center .sub { color: var(--ink-muted); font-size: .93rem; margin-bottom: 36px; }
+.contact-links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* GitHub card */
+.gh-card {
+  display: flex; align-items: center; gap: 11px;
+  padding: 12px 22px 12px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(176,157,107,.28);
+  color: var(--ink-muted); font-size: .9rem;
+  transition: .2s;
+}
+.gh-card:hover { border-color:var(--gold-mid); color:var(--ink); background:rgba(176,157,107,.07); }
+.gh-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, #1e1e3a, #2a1b45);
+  border: 1px solid rgba(176,157,107,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; flex-shrink: 0;
+}
+.gh-info { display: flex; flex-direction: column; line-height: 1.25; }
+.gh-name { font-weight: 600; font-size: .82rem; color: var(--ink); }
+.gh-sub  { font-size: .72rem; color: var(--ink-faint); }
+
+/* ══════════════════════ FOOTER ══════════════════════ */
+footer { padding: 48px 0 64px; text-align: center; color: var(--ink-faint); font-size: .78rem; border-top: 1px solid rgba(255,255,255,.04); }
+footer a { color: var(--gold-mid); }
+
+/* ══════════════════════ RESPONSIVE ══════════════════════ */
+@media (max-width:720px) {
+  .nav-links { display: none; }
+  header.hero { padding: 80px 0 0; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .score-grid { grid-template-columns: 1fr; }
+}
+@media (max-width:480px) {
+  .wrap { padding: 0 16px; }
+  .proj-card { padding: 20px; }
+  .bio { padding: 24px 22px; font-size: 1rem; }
+  .kpi-grid { grid-template-columns: 1fr; }
+}
+@media (max-width:480px) { .glass { backdrop-filter:none; -webkit-backdrop-filter:none; } }
+</style>
+</head>
+<body>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<!-- ══════════════════════════════════════════════ NAV -->
+<nav class="layer">
+  <div class="wrap">
+    <div class="brand">Lucas Cashwell<span class="dot">.</span></div>
+    <div class="nav-links">
+      <a href="#projects">Projects</a>
+      <a href="#background">About</a>
+    </div>
+    <a class="nav-cta" href="#contact">Say hello</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════ HERO -->
+<header class="hero layer">
+  <div class="wrap">
+    <span class="eyebrow">AI Projects</span>
+    <h1>How I'm using <em>AI</em></h1>
+    <p class="hero-sub">
+      I wanted to document what I've learned through building.<br>Welcome to my portfolio.
+    </p>
+    <div class="hero-btn-row">
+      <a class="btn-primary gold-metal" href="#projects">See the builds</a>
+      <a class="btn-ghost" href="#contact">Say hello</a>
+    </div>
+  </div>
+
+  <!-- Marquee carousel — project showcase -->
+  <div class="carousel-wrap">
+    <div class="carousel-track" id="carousel">
+
+      <div class="carousel-card glass">
+        <span class="c-tag">MCP Tool</span>
+        <h4>rls-guard</h4>
+        <p>Ship-readiness check for Supabase. Points at your own project and flags every open table — with the SQL fix.</p>
+        <div class="c-chips">
+          <span class="c-chip">TypeScript</span><span class="c-chip">MCP SDK</span><span class="c-chip">npm</span>
+        </div>
+      </div>
+
+      <div class="carousel-card glass">
+        <span class="c-tag">Personal Project</span>
+        <h4>Prompt Emporium</h4>
+        <p>A full-stack app for storing, versioning, and AI-improving prompts and Claude skills. Built solo as a learning project.</p>
+        <div class="c-chips">
+          <span class="c-chip">Next.js</span><span class="c-chip">Supabase</span><span class="c-chip">Stripe</span>
+        </div>
+      </div>
+
+      <div class="carousel-card glass">
+        <span class="c-tag">Prototype · BTC Suite</span>
+        <h4>MSTR Bond Decoder</h4>
+        <p>Decomposes MicroStrategy's entire convertible note stack. Real 8-K filing data — NAV, BTC yield, arbitrage signals.</p>
+        <div class="c-chips">
+          <span class="c-chip">Python</span><span class="c-chip">Streamlit</span><span class="c-chip">Plotly</span>
+        </div>
+      </div>
+
+      <div class="carousel-card glass">
+        <span class="c-tag">Prototype · BTC Suite</span>
+        <h4>Treasury Optimizer</h4>
+        <p>Model optimal BTC acquisition strategy for any corporate treasury. Stress-tests against historical drawdowns.</p>
+        <div class="c-chips">
+          <span class="c-chip">Python</span><span class="c-chip">Pandas</span><span class="c-chip">Streamlit</span>
+        </div>
+      </div>
+
+      <div class="carousel-card glass">
+        <span class="c-tag">Prototype · BTC Suite</span>
+        <h4>Adoption Tracker</h4>
+        <p>NLP pipeline scoring S&P 500 companies on BTC treasury adoption readiness. Generates Strive-style activist letters.</p>
+        <div class="c-chips">
+          <span class="c-chip">Python</span><span class="c-chip">NLP</span><span class="c-chip">Streamlit</span>
+        </div>
+      </div>
+
+      <div class="carousel-card glass">
+        <span class="c-tag">Prototype</span>
+        <h4>Blockchain Risk Tool</h4>
+        <p>Claude-powered on-chain transaction analyzer that produces professional-grade PDF reports from wallet addresses.</p>
+        <div class="c-chips">
+          <span class="c-chip">Python</span><span class="c-chip">FastAPI</span><span class="c-chip">Claude API</span>
+        </div>
+      </div>
+
+      <!-- Duplicate set for seamless loop -->
+      <div class="carousel-card glass">
+        <span class="c-tag">MCP Tool</span>
+        <h4>rls-guard</h4>
+        <p>Ship-readiness check for Supabase. Points at your own project and flags every open table — with the SQL fix.</p>
+        <div class="c-chips"><span class="c-chip">TypeScript</span><span class="c-chip">MCP SDK</span><span class="c-chip">npm</span></div>
+      </div>
+      <div class="carousel-card glass">
+        <span class="c-tag">Personal Project</span>
+        <h4>Prompt Emporium</h4>
+        <p>A full-stack app for storing, versioning, and AI-improving prompts and Claude skills. Built solo as a learning project.</p>
+        <div class="c-chips"><span class="c-chip">Next.js</span><span class="c-chip">Supabase</span><span class="c-chip">Stripe</span></div>
+      </div>
+      <div class="carousel-card glass">
+        <span class="c-tag">Prototype · BTC Suite</span>
+        <h4>MSTR Bond Decoder</h4>
+        <p>Decomposes MicroStrategy's entire convertible note stack. Real 8-K filing data — NAV, BTC yield, arbitrage signals.</p>
+        <div class="c-chips"><span class="c-chip">Python</span><span class="c-chip">Streamlit</span><span class="c-chip">Plotly</span></div>
+      </div>
+      <div class="carousel-card glass">
+        <span class="c-tag">Prototype · BTC Suite</span>
+        <h4>Treasury Optimizer</h4>
+        <p>Model optimal BTC acquisition strategy for any corporate treasury. Stress-tests against historical drawdowns.</p>
+        <div class="c-chips"><span class="c-chip">Python</span><span class="c-chip">Pandas</span><span class="c-chip">Streamlit</span></div>
+      </div>
+      <div class="carousel-card glass">
+        <span class="c-tag">Prototype · BTC Suite</span>
+        <h4>Adoption Tracker</h4>
+        <p>NLP pipeline scoring S&P 500 on BTC adoption readiness. Generates Strive-style activist letters.</p>
+        <div class="c-chips"><span class="c-chip">Python</span><span class="c-chip">NLP</span><span class="c-chip">Streamlit</span></div>
+      </div>
+      <div class="carousel-card glass">
+        <span class="c-tag">Prototype</span>
+        <h4>Blockchain Risk Tool</h4>
+        <p>Claude-powered on-chain analyzer producing professional-grade PDF reports from wallet addresses.</p>
+        <div class="c-chips"><span class="c-chip">Python</span><span class="c-chip">FastAPI</span><span class="c-chip">Claude API</span></div>
+      </div>
+
+    </div><!-- /carousel-track -->
+  </div><!-- /carousel-wrap -->
+</header>
+
+<!-- ══════════════════════════════════════════════ PROJECTS -->
+<section id="projects" class="layer">
+  <div class="wrap">
+    <span class="eyebrow fade-up">Projects</span>
+    <h2 class="fade-up">Things I've built</h2>
+    <p class="section-intro fade-up">A few different directions — developer tooling, a full-stack app, and financial prototypes.</p>
+
+    <!-- ── rls-guard ── -->
+    <div class="proj-card glass fade-up">
+      <div class="proj-header">
+        <h3>rls-guard</h3>
+        <span class="badge badge-pub">📦 Published on npm</span>
+      </div>
+      <p class="proj-desc">
+        An MCP server that points at your own Supabase project and tells you — in plain language —
+        which tables the public anon key can read, then gives you the exact SQL to lock each one down.
+        No dashboards, no sign-up. Your AI assistant runs it for you.
+      </p>
+      <ul class="proj-points">
+        <li><strong>Distributed through the AI-recommendation channel.</strong> Agents discover and suggest installing it — MCP registries are the new app store for developer tools.</li>
+        <li><strong>Severity that makes sense.</strong> Distinguishes accidentally-public tables from intentionally-public content, weighted by what's actually in them.</li>
+        <li><strong>Built from firsthand knowledge.</strong> I wrote the Supabase RLS for Prompt Emporium by hand — this tool packages exactly that.</li>
+      </ul>
+      <div class="chips">
+        <span class="chip">TypeScript</span><span class="chip">MCP SDK</span><span class="chip">npm</span><span class="chip">PostgREST</span><span class="chip">Node.js</span>
+      </div>
+      <div class="proj-links">
+        <a class="proj-link" href="https://github.com/lucascashwell3-ai" target="_blank" rel="noopener">GitHub ↗</a>
+        <a class="proj-link" href="https://npmjs.com/package/rls-guard-mcp" target="_blank" rel="noopener">npm ↗</a>
+      </div>
+    </div>
+
+    <!-- ── Prompt Emporium ── -->
+    <div class="proj-card glass fade-up">
+      <div class="proj-header">
+        <h3>Prompt Emporium</h3>
+        <span class="badge badge-wip">⚙ In development</span>
+      </div>
+      <p class="proj-desc">
+        A personal project I built to learn full-stack development with AI. It's a web app for storing, versioning, and AI-improving prompts and Claude skills — with auth, payments wired up, and a community library.
+        Still evolving; I use it internally and learn from it as I go.
+      </p>
+      <ul class="proj-points">
+        <li><strong>First full-stack build.</strong> Next.js, Supabase (auth + Postgres + RLS), Stripe, Vercel — all set up from scratch.</li>
+        <li><strong>Learned how to direct AI agents.</strong> Built across many Claude Code sessions; figured out how to get consistent, production-quality output.</li>
+        <li><strong>Where I figured out deployment.</strong> Vercel deployment config, Supabase environment management, OAuth, webhook handling — most of the hard config lessons came from this project.</li>
+      </ul>
+      <div class="chips">
+        <span class="chip">Next.js 15</span><span class="chip">TypeScript</span><span class="chip">Supabase</span><span class="chip">Anthropic API</span><span class="chip">Stripe</span><span class="chip">Vercel</span>
+      </div>
+    </div>
+
+    <!-- ── BTC Intelligence Suite ── -->
+    <div class="proj-card glass fade-up">
+      <div class="proj-header">
+        <h3>BTC Intelligence Suite</h3>
+        <span class="badge badge-proto">◆ Prototypes</span>
+      </div>
+      <p class="proj-desc">
+        Three Streamlit apps built to explore Bitcoin treasury intelligence — MSTR's capital structure, corporate treasury modeling, and adoption tracking. Real public filing data where it matters.
+      </p>
+
+      <!-- Tab switcher -->
+      <div class="app-tabs">
+        <button class="app-tab active" onclick="switchTab(this,'tab-decoder')">Bond Decoder</button>
+        <button class="app-tab" onclick="switchTab(this,'tab-optimizer')">Treasury Optimizer</button>
+        <button class="app-tab" onclick="switchTab(this,'tab-tracker')">Adoption Tracker</button>
+      </div>
+
+      <!-- ── TAB 1: CONVERTIBLE BOND DECODER ── -->
+      <div id="tab-decoder" class="mockup-panel active">
+        <div class="app-chrome">
+          <div class="app-titlebar">
+            <div class="dots"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div></div>
+            <div class="title">MSTR CONVERTIBLE BOND DECODER · Streamlit</div>
+          </div>
+          <div class="app-body">
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-label">BTC Holdings</div>
+                <div class="kpi-val">576,230</div>
+                <div class="kpi-sub">Total BTC on balance sheet</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">BTC NAV (Gross)</div>
+                <div class="kpi-val">$55.9B</div>
+                <div class="kpi-sub">Debt: $7.2B · Equity NAV: $48.7B</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">NAV Premium to Market</div>
+                <div class="kpi-val red">+187%</div>
+                <div class="kpi-sub">Market Cap $140B vs NAV $48.7B</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Blended Cost Basis</div>
+                <div class="kpi-val">$39,040</div>
+                <div class="kpi-sub">Across 23 tranches since Aug 2020</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Unrealized Gain vs Basis</div>
+                <div class="kpi-val green">+43.2B</div>
+                <div class="kpi-sub">Total capital deployed: $22.4B</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Primary Capital Source</div>
+                <div class="kpi-val blue" style="font-size:1rem;padding-top:4px;">ATM Equity</div>
+                <div class="kpi-sub">57% of $22.4B total deployed</div>
+              </div>
+            </div>
+            <div style="font-size:9px;color:#4455aa;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:8px 0 6px;border-top:1px solid #1a1a2e;">Convertible Note Tranches — Active</div>
+            <table class="mini-table">
+              <thead><tr><th>Maturity</th><th>Face Value</th><th>Coupon</th><th>Conv Price/sh</th><th>Conv Premium</th></tr></thead>
+              <tbody>
+                <tr><td>2032</td><td class="btc">$1,050M</td><td>0.000%</td><td>$672.40</td><td class="pos">+35%</td></tr>
+                <tr><td>2031</td><td class="btc">$800M</td><td>2.250%</td><td>$397.99</td><td class="pos">+20%</td></tr>
+                <tr><td>2030</td><td class="btc">$800M</td><td>0.000%</td><td>$204.89</td><td class="pos">+15%</td></tr>
+                <tr><td>2029</td><td class="btc">$1,010M</td><td>0.625%</td><td>$183.19</td><td class="pos">+12%</td></tr>
+                <tr><td>2028</td><td class="btc">$700M</td><td>0.875%</td><td>$149.77</td><td class="pos">+8%</td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:10px;font-size:9px;color:#2a2a4a;text-align:right;">Data sourced from MSTR 8-K filings, 10-Q/10-K, press releases (public record)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB 2: TREASURY OPTIMIZER ── -->
+      <div id="tab-optimizer" class="mockup-panel">
+        <div class="app-chrome">
+          <div class="app-titlebar">
+            <div class="dots"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div></div>
+            <div class="title">BTC TREASURY OPTIMIZER · Streamlit</div>
+          </div>
+          <div class="app-body">
+            <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:14px;">
+              <div>
+                <div style="font-size:9px;color:#4455aa;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Parameters</div>
+                <div class="slider-group">
+                  <div class="slider-row">
+                    <div class="slider-name">Cash on B/S ($M)</div>
+                    <div class="slider-track"><div class="slider-fill" style="width:40%"></div></div>
+                    <div class="slider-val">$2,000</div>
+                  </div>
+                  <div class="slider-row">
+                    <div class="slider-name">BTC Allocation %</div>
+                    <div class="slider-track"><div class="slider-fill" style="width:25%"></div></div>
+                    <div class="slider-val">25%</div>
+                  </div>
+                  <div class="slider-row">
+                    <div class="slider-name">BTC Price ($)</div>
+                    <div class="slider-track"><div class="slider-fill" style="width:60%"></div></div>
+                    <div class="slider-val">$97,000</div>
+                  </div>
+                  <div class="slider-row">
+                    <div class="slider-name">BTC CAGR (%/yr)</div>
+                    <div class="slider-track"><div class="slider-fill" style="width:31%"></div></div>
+                    <div class="slider-val">25%</div>
+                  </div>
+                  <div class="slider-row">
+                    <div class="slider-name">Time Horizon (yrs)</div>
+                    <div class="slider-track"><div class="slider-fill" style="width:50%"></div></div>
+                    <div class="slider-val">5 yrs</div>
+                  </div>
+                  <div class="slider-row">
+                    <div class="slider-name">Debt Capacity ($M)</div>
+                    <div class="slider-track"><div class="slider-fill" style="width:25%"></div></div>
+                    <div class="slider-val">$500</div>
+                  </div>
+                  <div class="slider-row">
+                    <div class="slider-name">Shares Out (M)</div>
+                    <div class="slider-track"><div class="slider-fill" style="width:40%"></div></div>
+                    <div class="slider-val">250M</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:9px;color:#4455aa;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">5-Year Projection</div>
+                <div class="kpi-grid" style="grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                  <div class="kpi-card">
+                    <div class="kpi-label">BTC Acquired</div>
+                    <div class="kpi-val" style="font-size:1.2rem;">5,154 BTC</div>
+                    <div class="kpi-sub">$500M capital deployed</div>
+                  </div>
+                  <div class="kpi-card">
+                    <div class="kpi-label">BTC Yield (Y5)</div>
+                    <div class="kpi-val green" style="font-size:1.2rem;">+340%</div>
+                    <div class="kpi-sub">BTC/share growth vs baseline</div>
+                  </div>
+                  <div class="kpi-card">
+                    <div class="kpi-label">Portfolio NAV Y5</div>
+                    <div class="kpi-val" style="font-size:1.2rem;">$1.64B</div>
+                    <div class="kpi-sub">At 25% CAGR BTC price</div>
+                  </div>
+                  <div class="kpi-card">
+                    <div class="kpi-label">BTC per share Y5</div>
+                    <div class="kpi-val blue" style="font-size:1.2rem;">0.0206</div>
+                    <div class="kpi-sub">vs 0 baseline (no BTC)</div>
+                  </div>
+                </div>
+                <!-- Simple SVG sparkline chart -->
+                <svg viewBox="0 0 260 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;border-radius:6px;background:#0d0d1a;">
+                  <defs>
+                    <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#f7931a" stop-opacity=".35"/>
+                      <stop offset="100%" stop-color="#f7931a" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Grid lines -->
+                  <line x1="0" y1="20" x2="260" y2="20" stroke="#1a1a2e" stroke-width="1"/>
+                  <line x1="0" y1="40" x2="260" y2="40" stroke="#1a1a2e" stroke-width="1"/>
+                  <line x1="0" y1="60" x2="260" y2="60" stroke="#1a1a2e" stroke-width="1"/>
+                  <!-- Area fill -->
+                  <path d="M10,75 C30,73 60,68 90,60 S140,42 180,28 S230,14 250,10 L250,78 L10,78 Z" fill="url(#g1)"/>
+                  <!-- Line -->
+                  <path d="M10,75 C30,73 60,68 90,60 S140,42 180,28 S230,14 250,10" fill="none" stroke="#f7931a" stroke-width="2" stroke-linecap="round"/>
+                  <!-- Labels -->
+                  <text x="10" y="78" fill="#4455aa" font-size="7">Y1</text>
+                  <text x="90" y="78" fill="#4455aa" font-size="7">Y2</text>
+                  <text x="150" y="78" fill="#4455aa" font-size="7">Y3-4</text>
+                  <text x="230" y="78" fill="#4455aa" font-size="7">Y5</text>
+                  <text x="238" y="13" fill="#f7931a" font-size="8" font-weight="600">+340%</text>
+                </svg>
+                <div style="font-size:8px;color:#2a2a4a;margin-top:4px;">BTC Yield trajectory (BTC/share vs baseline)</div>
+              </div>
+            </div>
+            <!-- Drawdown stress test -->
+            <div style="font-size:9px;color:#4455aa;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:12px 0 8px;border-top:1px solid #1a1a2e;padding-top:10px;">Historical Drawdown Stress Test</div>
+            <div class="bar-chart">
+              <div class="bar-row">
+                <div class="bar-label">2011 −93%</div>
+                <div class="bar-track"><div class="bar-fill" style="width:93%;background:linear-gradient(90deg,#ff3333,#ff5555);"><span class="bar-val">Survives at $500M treasury</span></div></div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">2018 −84%</div>
+                <div class="bar-track"><div class="bar-fill" style="width:84%;background:linear-gradient(90deg,#ff4444,#ff6666);"><span class="bar-val">Solvency intact</span></div></div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">2022 −77%</div>
+                <div class="bar-track"><div class="bar-fill" style="width:77%;background:linear-gradient(90deg,#f7931a,#fbb040);"><span class="bar-val">NAV &gt; Debt</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB 3: ADOPTION TRACKER ── -->
+      <div id="tab-tracker" class="mockup-panel">
+        <div class="app-chrome">
+          <div class="app-titlebar">
+            <div class="dots"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div></div>
+            <div class="title">CORPORATE BTC ADOPTION TRACKER · Streamlit</div>
+          </div>
+          <div class="app-body">
+            <div style="font-size:9px;color:#4455aa;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Adoption Score · High-Probability Targets</div>
+            <div class="score-grid">
+              <div class="score-card">
+                <div class="score-ticker">AAPL</div>
+                <div class="score-name">Apple · Technology</div>
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:78%;background:linear-gradient(90deg,#f7931a,#fbb040);height:100%;border-radius:3px;"></div></div>
+                <div class="score-number">78</div>
+                <div style="font-size:8px;color:#556;margin-top:4px;">$162B cash · CEO neutral · Activist pressure building</div>
+              </div>
+              <div class="score-card">
+                <div class="score-ticker">MSFT</div>
+                <div class="score-name">Microsoft · Technology</div>
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:72%;background:linear-gradient(90deg,#f7931a,#fbb040);height:100%;border-radius:3px;"></div></div>
+                <div class="score-number">72</div>
+                <div style="font-size:8px;color:#556;margin-top:4px;">$78B cash · Shareholder vote failed Dec 2024 · pressure ↑</div>
+              </div>
+              <div class="score-card">
+                <div class="score-ticker">MSTR</div>
+                <div class="score-name">MicroStrategy · Software</div>
+                <div class="adopted-badge">● Adopted</div>
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:100%;background:linear-gradient(90deg,#00b050,#00e676);height:100%;border-radius:3px;"></div></div>
+                <div class="score-number" style="color:#00e676">100</div>
+                <div style="font-size:8px;color:#556;margin-top:4px;">444K BTC held. Pioneer. This IS the playbook.</div>
+              </div>
+              <div class="score-card">
+                <div class="score-ticker">GOOGL</div>
+                <div class="score-name">Alphabet · Technology</div>
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:65%;background:linear-gradient(90deg,#f7931a,#fbb040);height:100%;border-radius:3px;"></div></div>
+                <div class="score-number">65</div>
+                <div style="font-size:8px;color:#556;margin-top:4px;">$93B cash growing $25B/yr · returns via buybacks</div>
+              </div>
+              <div class="score-card">
+                <div class="score-ticker">SQ</div>
+                <div class="score-name">Block, Inc. · FinTech</div>
+                <div class="adopted-badge">● Adopted</div>
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:95%;background:linear-gradient(90deg,#00b050,#00e676);height:100%;border-radius:3px;"></div></div>
+                <div class="score-number" style="color:#00e676">95</div>
+                <div style="font-size:8px;color:#556;margin-top:4px;">Jack Dorsey BTC maximalist · ongoing DCA from gross profit</div>
+              </div>
+              <div class="score-card">
+                <div class="score-ticker">META</div>
+                <div class="score-name">Meta Platforms · Tech</div>
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:58%;background:linear-gradient(90deg,#6644ff,#8866ff);height:100%;border-radius:3px;"></div></div>
+                <div class="score-number" style="color:#8866ff">58</div>
+                <div style="font-size:8px;color:#556;margin-top:4px;">$52B cash · Zuck previously bullish crypto (Libra/Diem)</div>
+              </div>
+            </div>
+            <!-- Activist letter preview -->
+            <div style="font-size:9px;color:#4455aa;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:12px 0 6px;border-top:1px solid #1a1a2e;padding-top:10px;">Activist Letter Generator → AAPL selected</div>
+            <div class="letter-preview">
+              <div class="ltr-company">Dear Apple Board of Directors,</div><br>
+              We write as concerned shareholders regarding Apple's $<span class="ltr-btc">162 billion</span> cash and equivalents position, which currently earns a nominal nominal yield while losing real purchasing power to monetary debasement.<br><br>
+              A <span class="ltr-btc">5% allocation (~$8.1B)</span> to Bitcoin as a treasury reserve asset would represent approximately <span class="ltr-btc">81,000 BTC</span> at current market prices — consistent with the treasury strategies successfully employed by MicroStrategy (444K BTC), Block, Inc., and Tesla...<br><br>
+              The precedent is clear. Saylor's BTC Yield metric — the increase in BTC per diluted share — has compounded at...
+            </div>
+            <div style="font-size:8px;color:#2a2a4a;margin-top:4px;text-align:right;">Generated letter downloads as .txt · company-specific data autofilled</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chips" style="margin-top:6px;">
+        <span class="chip">Python</span><span class="chip">Streamlit</span><span class="chip">Pandas</span><span class="chip">Plotly</span><span class="chip">Public 8-K data</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ BACKGROUND -->
+<section id="background" class="layer">
+  <div class="wrap">
+    <span class="eyebrow fade-up">About</span>
+    <h2 class="fade-up">A little about me</h2>
+
+    <div class="bio glass fade-up">
+      I work in financial services — inside the controls and compliance world that most people read about in quarterly reports.
+      Like a lot of people in that world, I got frustrated watching the gap between what AI could actually do and what everyone was doing with it.
+      So I started building — on my own time, with my own curiosity as the only deadline.
+      <br><br>
+      These projects are how I learn. Some are polished, some are rough, all of them taught me something real.
+      That's the honest version of what this site is — <em>a record of the learning, not just the highlights.</em>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ CONTACT -->
+<section id="contact" class="layer">
+  <div class="wrap">
+    <div class="contact-center fade-up">
+      <span class="eyebrow">Contact</span>
+      <h2>Say hello</h2>
+      <p class="sub">Always happy to talk AI, building, or whatever you're working on.</p>
+      <div class="contact-links">
+        <a class="btn-primary gold-metal" href="mailto:lucascashwell3@gmail.com">
+          Email me
+        </a>
+        <a class="btn-ghost" href="https://www.linkedin.com/in/lucas-cashwell/" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="opacity:.8"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a class="gh-card" href="https://github.com/lucascashwell3-ai" target="_blank" rel="noopener">
+          <div class="gh-avatar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#CAB77D"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          </div>
+          <div class="gh-info">
+            <span class="gh-name">lucascashwell3-ai</span>
+            <span class="gh-sub">github.com</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="layer">
+  <div class="wrap">
+    <div>© <span id="yr"></span> Lucas Cashwell</div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════ SCRIPTS -->
+<script>
+/* Year */
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* Stars */
+(function(){
+  const c = document.getElementById('stars'), ctx = c.getContext('2d');
+  const rm = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let W, H, stars=[];
+  function init(){
+    W=c.width=window.innerWidth; H=c.height=window.innerHeight;
+    stars=Array.from({length:rm?70:100},()=>({
+      x:Math.random()*W, y:Math.random()*H,
+      r:Math.random()*.95+.15,
+      base:Math.random()*.4+.06,
+      amp:Math.random()*.28,
+      spd:Math.random()*.0018+.0006,
+      ph:Math.random()*Math.PI*2
+    }));
+  }
+  function tick(t){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      const a=rm?s.base:s.base+s.amp*Math.sin(s.ph+t*s.spd);
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(253,251,244,${a})`; ctx.fill();
+    });
+    if(!rm) requestAnimationFrame(tick);
+  }
+  window.addEventListener('resize',init); init();
+  rm ? tick(0) : requestAnimationFrame(tick);
+})();
+
+/* Scroll fade-up */
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const obs=new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}
+  }),{threshold:.1});
+  document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+})();
+
+/* BTC App tabs */
+function switchTab(btn, panelId){
+  document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.mockup-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+</script>
+</body>
+</html>
