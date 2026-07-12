@@ -398,6 +398,15 @@ footer a { color: var(--gold-mid); }
     <div class="carousel-track" id="carousel">
 
       <div class="carousel-card glass">
+        <span class="c-tag">Flagship · Live</span>
+        <h4>DATproof</h4>
+        <p>The verification layer for bitcoin treasury companies. Of 1.1M BTC disclosed by the 10 biggest corporate holders, 0% is verifiable on-chain — tracked and rebuilt nightly.</p>
+        <div class="c-chips">
+          <span class="c-chip">Python</span><span class="c-chip">On-chain</span><span class="c-chip">GitHub Actions</span>
+        </div>
+      </div>
+
+      <div class="carousel-card glass">
         <span class="c-tag">MCP Tool</span>
         <h4>rls-guard</h4>
         <p>Ship-readiness check for Supabase. Points at your own project and flags every open table — with the SQL fix.</p>
@@ -453,6 +462,12 @@ footer a { color: var(--gold-mid); }
 
       <!-- Duplicate set for seamless loop -->
       <div class="carousel-card glass">
+        <span class="c-tag">Flagship · Live</span>
+        <h4>DATproof</h4>
+        <p>The verification layer for bitcoin treasury companies. Of 1.1M BTC disclosed by the 10 biggest corporate holders, 0% is verifiable on-chain — tracked and rebuilt nightly.</p>
+        <div class="c-chips"><span class="c-chip">Python</span><span class="c-chip">On-chain</span><span class="c-chip">GitHub Actions</span></div>
+      </div>
+      <div class="carousel-card glass">
         <span class="c-tag">MCP Tool</span>
         <h4>rls-guard</h4>
         <p>Ship-readiness check for Supabase. Points at your own project and flags every open table — with the SQL fix.</p>
@@ -498,7 +513,34 @@ footer a { color: var(--gold-mid); }
   <div class="wrap">
     <span class="eyebrow fade-up">Projects</span>
     <h2 class="fade-up">Things I've built</h2>
-    <p class="section-intro fade-up">A few different directions — developer tooling, a full-stack app, and financial prototypes.</p>
+    <p class="section-intro fade-up">Led by DATproof — my flagship — alongside developer tooling, a full-stack app, and earlier financial prototypes.</p>
+
+    <!-- ── DATproof (flagship) ── -->
+    <div class="proj-card glass fade-up">
+      <div class="proj-header">
+        <h3>DATproof</h3>
+        <span class="badge badge-pub">🟢 Live · rebuilt nightly</span>
+      </div>
+      <p class="proj-desc">
+        Public companies hold over 1.1 million BTC. DATproof measures how much of it is actually
+        verifiable on-chain — and today the answer is 0%. It tracks every major corporate treasury,
+        checks published wallet addresses against the chain, and rebuilds a sourced research
+        tearsheet every night.
+      </p>
+      <ul class="proj-points">
+        <li><strong>Verification over trust.</strong> Every figure carries a source and an as-of date; anything that can't be verified renders as absent, never estimated.</li>
+        <li><strong>The whole pipeline runs itself.</strong> A nightly GitHub Action re-checks prices, on-chain balances, and cycle context, then republishes the site — no hands.</li>
+        <li><strong>Grounded in real disclosures.</strong> 8-K filings, treasury dashboards, and on-chain reconciliation — not vibes.</li>
+      </ul>
+      <div class="chips">
+        <span class="chip">Python</span><span class="chip">On-chain data</span><span class="chip">GitHub Actions</span><span class="chip">Static site</span>
+      </div>
+      <div class="proj-links">
+        <a class="proj-link" href="https://lucascashwell3-ai.github.io/datproof/" target="_blank" rel="noopener">Live site ↗</a>
+        <a class="proj-link" href="https://lucascashwell3-ai.github.io/datproof/tearsheet/" target="_blank" rel="noopener">Today's tearsheet ↗</a>
+        <a class="proj-link" href="https://github.com/lucascashwell3-ai/datproof" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
 
     <!-- ── rls-guard ── -->
     <div class="proj-card glass fade-up">
