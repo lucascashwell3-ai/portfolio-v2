@@ -132,42 +132,54 @@ canvas#stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
   .coast-nav .r a.cta:hover { background: rgba(255,255,255,.16); }
 }
 
-/* ══════════════════════ HERO (coastline — self-contained animated scene) ══════════════════════ */
+/* ═══════════════ HERO (painterly coastline image + code overlays) ═══════════════ */
 .coast-hero {
-  position: relative; z-index: 2; min-height: 100vh; overflow: hidden;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding: 110px 22px 90px; background: #0d0f1e;
+  position: relative; z-index: 2; min-height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
+  text-align: left; padding: clamp(116px,18vh,210px) clamp(24px,6vw,88px) 92px;
+  /* on-brand fallback (sky→sea→sand) shown only for the instant before the painting decodes */
+  background: linear-gradient(180deg, #2a3766 0%, #6a5675 34%, #c07a5c 62%, #e7a866 82%, #d8b487 100%);
 }
-.coast-hero #scene { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
-.coast-hero .grain {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .10; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+.coast-hero .hero-img {
+  position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 46%;
 }
-.coast-hero .vig {
+/* sunset→night grade veil — opacity driven by --hp (scroll progress through the hero) */
+.coast-hero .hero-grade {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: radial-gradient(125% 95% at 50% 40%, transparent 38%, rgba(34,12,24,.34) 78%, rgba(20,7,16,.6) 100%);
+  background: linear-gradient(158deg, #1b1c46 0%, #191234 46%, #120d24 74%, #0a0815 100%);
+  opacity: calc(var(--hp, 0) * 0.86);
 }
-.coast-hero .textglow {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: radial-gradient(58% 40% at 50% 47%, rgba(12,7,18,.4), rgba(12,7,18,.14) 55%, transparent 72%);
+/* bottom fade → dusk: dissolves the hero into the projects section (kills the seam) */
+.coast-hero .hero-seam {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 30%; z-index: 2; pointer-events: none;
+  background: linear-gradient(180deg, rgba(22,18,38,0) 0%, rgba(20,16,34,.5) 54%, var(--dusk) 100%);
 }
-.coast-hero__inner { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+/* legibility scrim — darkens top + upper-left where the text sits */
+.coast-hero .hero-scrim {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background:
+    linear-gradient(103deg, rgba(9,7,17,.72) 0%, rgba(9,7,17,.48) 25%, rgba(9,7,17,.13) 47%, transparent 64%),
+    linear-gradient(180deg, rgba(9,7,17,.58) 0%, rgba(9,7,17,.1) 16%, transparent 26%);
+}
+.coast-hero .hero-fx { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
+.coast-hero__inner { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: flex-start; max-width: 600px; }
 .coast-hero .eyebrow {
-  font-family: var(--sans); font-size: .72rem; font-weight: 600; letter-spacing: .3em; text-transform: uppercase;
-  color: #fff1d6; margin-bottom: 20px; text-shadow: 0 2px 20px rgba(70,26,12,.6), 0 1px 3px rgba(0,0,0,.4);
+  font-family: var(--sans); font-size: .72rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase;
+  color: #ffe7c6; margin-bottom: 18px; text-shadow: 0 2px 18px rgba(30,14,8,.7), 0 1px 3px rgba(0,0,0,.5);
 }
 .coast-hero .wordmark {
-  font-family: var(--serif); font-weight: 400; letter-spacing: -.015em;
-  font-size: clamp(4.4rem, 14vw, 10.5rem); line-height: .9; color: #fff;
-  text-shadow: 0 3px 44px rgba(20,10,30,.5), 0 1px 3px rgba(0,0,0,.3);
+  font-family: var(--serif); font-weight: 400; letter-spacing: -.018em;
+  font-size: clamp(3.6rem, 11vw, 8rem); line-height: .92; color: #fff;
+  text-shadow: 0 4px 40px rgba(10,6,20,.55), 0 1px 4px rgba(0,0,0,.4);
 }
 .coast-hero .tagline {
   font-family: var(--serif); font-weight: 300; font-style: italic;
-  font-size: clamp(1.05rem, 2.3vw, 1.5rem); color: #f7eeda; margin-top: 20px; max-width: 600px; line-height: 1.5;
-  text-shadow: 0 2px 22px rgba(20,8,4,.6);
+  font-size: clamp(1.05rem, 2.3vw, 1.5rem); color: #f7eeda; margin-top: 20px; max-width: 30ch; line-height: 1.5;
+  text-shadow: 0 2px 20px rgba(10,6,4,.7);
 }
 .coast-hero .tagline b { font-style: normal; font-weight: 400; color: #fff; }
-.coast-hero .cta-row { display: flex; gap: 14px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
+.coast-hero .cta-row { display: flex; gap: 14px; justify-content: flex-start; margin-top: 38px; flex-wrap: wrap; }
 .coast-hero .btn-primary {
   display: inline-flex; align-items: center; gap: 9px; padding: 15px 32px; border-radius: 999px;
   font-weight: 600; font-size: .94rem; color: #2a1a08; background: linear-gradient(135deg, #f6c877, #e0a860);
@@ -188,7 +200,11 @@ canvas#stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 .form-in.d1 { animation-delay: .12s; } .form-in.d2 { animation-delay: .3s; } .form-in.d3 { animation-delay: .48s; }
 @keyframes coastup { to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .form-in { animation: none; opacity: 1; transform: none; } }
-@media (max-width: 600px) { .coast-nav .r a:not(.cta) { display: none; } }
+@media (max-width: 600px) {
+  .coast-nav .r a:not(.cta) { display: none; }
+  .coast-hero { padding-top: clamp(104px,15vh,150px); }
+  .coast-hero .hero-img { object-position: 22% 48%; }   /* portrait crop keeps sun + reflection + couple */
+}
 
 .btn-primary {
   display: inline-flex; align-items: center;
@@ -382,10 +398,11 @@ footer a { color: var(--gold-mid); }
 
 <!-- ══════════════════════════════════════════════ HERO (coastline) -->
 <header class="coast-hero" id="top">
-  <canvas id="scene" aria-hidden="true"></canvas>
-  <div class="grain" aria-hidden="true"></div>
-  <div class="vig" aria-hidden="true"></div>
-  <div class="textglow" aria-hidden="true"></div>
+  <img class="hero-img" src="assets/hero/coast-web.jpg" alt="Golden-hour view from a wildflower hilltop over a curving beach — a couple and their dog walk the shore, a small plane rests on the bluff, and three crosses stand on the far headland" fetchpriority="high" decoding="async">
+  <div class="hero-grade" aria-hidden="true"></div>
+  <div class="hero-seam" aria-hidden="true"></div>
+  <div class="hero-scrim" aria-hidden="true"></div>
+  <canvas class="hero-fx" aria-hidden="true"></canvas>
 
   <div class="coast-hero__inner">
     <span class="eyebrow form-in">Portfolio · Lucas Cashwell</span>
@@ -606,251 +623,204 @@ footer a { color: var(--gold-mid); }
 /* Year */
 document.getElementById('yr').textContent = new Date().getFullYear();
 
-/* Stars */
+/* Atmosphere — the whole-page dusk→night journey: stars + fireflies that fade in as you scroll.
+   Behind the full-bleed hero painting nothing shows, so this only animates once you leave the hero. */
 (function(){
-  const c = document.getElementById('stars'), ctx = c.getContext('2d');
-  const rm = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  let W, H, stars=[];
-  function init(){
-    W=c.width=window.innerWidth; H=c.height=window.innerHeight;
-    stars=Array.from({length:rm?40:64},()=>({
-      x:Math.random()*W, y:Math.random()*H,
-      r:Math.random()*.95+.15,
-      base:Math.random()*.4+.06,
-      amp:Math.random()*.28,
-      spd:Math.random()*.0018+.0006,
-      ph:Math.random()*Math.PI*2
-    }));
-  }
-  function paint(){
-    ctx.clearRect(0,0,W,H);
-    stars.forEach(s=>{
-      const a=s.base+s.amp*0.55;                 // static brightness — no per-frame work
-      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(255,229,188,${a})`; ctx.fill();
-    });
-  }
-  // Static night sky, painted once. A fixed canvas that never repaints stays a cached
-  // compositor layer, so it costs nothing on scroll (unlike a per-frame RAF loop).
-  window.addEventListener('resize',()=>{ init(); paint(); });
-  init(); paint();
-})();
-
-/* Coastline hero — self-contained animated scene + perf guard + nav frost */
-(function(){
-  const cv = document.getElementById('scene');
-  if(!cv) return;
-  const ctx = cv.getContext('2d');
+  const c = document.getElementById('stars'); if(!c) return;
+  const ctx = c.getContext('2d');
   const hero = document.querySelector('.coast-hero');
-  const nav  = document.querySelector('.coast-nav');
   const rm = matchMedia('(prefers-reduced-motion:reduce)').matches;
-  let W, H, DPR, sun, clouds, glints, ripples, birds, grass, flowers;
-  let rafId = null;
-  const lerp = (a,b,t)=>a+(b-a)*t;
-
-  function resize(){
-    DPR = Math.min(devicePixelRatio||1, 2);
-    const w = cv.clientWidth || innerWidth, h = cv.clientHeight || innerHeight;
-    W = cv.width  = Math.round(w*DPR);
-    H = cv.height = Math.round(h*DPR);
-    if(W < 4 || H < 4) return;              // guard vs 0-size layout (getImageData/gradients)
-    build();
-    if(rm) draw(1000);                      // static repaint for reduced motion
+  const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+  const smooth=(a,b,x)=>{ x=clamp((x-a)/(b-a),0,1); return x*x*(3-2*x); };
+  let W,H,stars=[],flies=[],rafId=null;
+  function init(){
+    W=c.width=innerWidth; H=c.height=innerHeight;
+    stars=Array.from({length: rm?60:150},()=>({
+      x:Math.random()*W, y:Math.random()*H*0.94, r:Math.random()*1.05+.2,
+      base:Math.random()*.5+.22, amp:Math.random()*.42, sp:Math.random()*.0022+.0006, ph:Math.random()*6.28 }));
+    flies=Array.from({length: rm?0:22},()=>({
+      x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.4+.9, ph:Math.random()*6.28, sp:.6+Math.random()*1.1,
+      vx:(Math.random()-.5)*.16, vy:-(0.05+Math.random()*.12), base:.4+Math.random()*.5 }));
   }
-  function build(){
-    const hy = H*0.56;                       // horizon
-    sun = {x:W*0.76, y:hy-H*0.006, r:Math.min(W,H)*0.055, hy};
-    clouds = [];
-    const cyTop = H*0.22, cyBot = hy-H*0.05;
-    for(let i=0;i<5;i++){
-      const w = W*(0.07+Math.random()*0.08), h = H*(0.018+Math.random()*0.026);
-      const nb = 3+(Math.random()*3|0), blobs = [];
-      for(let j=0;j<nb;j++){
-        blobs.push({dx:(Math.random()-0.5)*w*1.5, dy:(Math.random()-0.5)*h*0.5,
-          rw:w*(0.4+Math.random()*0.45), rh:h*(0.55+Math.random()*0.5)});
-      }
-      clouds.push({x:Math.random()*W, y:lerp(cyTop,cyBot,Math.pow(Math.random(),0.7)),
-        w, h, a:0.10+Math.random()*0.10, spd:(0.04+Math.random()*0.06)*DPR, blobs});
-    }
-    glints = [];
-    for(let i=0;i<150;i++){
-      const p = Math.pow(Math.random(),0.7);
-      const y = hy+p*(H-hy);
-      const spread = sun.r*(0.5+p*5.0);
-      glints.push({y, x:sun.x+(Math.random()-0.5)*spread*2,
-        len:sun.r*(0.15+Math.random()*0.7)*(0.5+p),
-        ph:Math.random()*6.28, sp:0.4+Math.random()*1.6, base:0.15+Math.random()*0.5});
-    }
-    ripples = [];
-    for(let i=0;i<26;i++){ const p=Math.pow(i/26,1.5); ripples.push({y:hy+p*(H-hy), a:0.03+0.05*(1-p), drift:Math.random()*6.28}); }
-    birds = []; for(let i=0;i<2;i++) birds.push({x:W*(0.18+Math.random()*0.4), y:H*(0.15+Math.random()*0.1), s:Math.min(W,H)*0.008, spd:(0.08+Math.random()*0.08)*DPR, ph:Math.random()*6.28});
-    grass = [];
-    for(let i=0;i<82;i++){
-      const side = Math.random(); let gx;
-      if(side<0.46) gx = Math.random()*W*0.26;
-      else if(side<0.92) gx = W*0.74+Math.random()*W*0.26;
-      else gx = Math.random()*W;
-      grass.push({x:gx, h:H*(0.05+Math.random()*0.085), lean:(Math.random()-0.5)*0.55, ph:Math.random()*6.28, w:Math.max(1,H*0.0016)});
-    }
-    flowers = [];
-    for(let i=0;i<24;i++){
-      const left = Math.random()<0.5;
-      const fx = left ? Math.random()*W*0.2 : W*0.8+Math.random()*W*0.2;
-      flowers.push({x:fx, y:H*(0.9+Math.random()*0.07), c:Math.random()<0.55?'#e7c24a':'#b79adf', r:Math.max(1.3,H*0.0028)});
-    }
-  }
-
-  function sky(){
-    const hy = sun.hy;
-    const g = ctx.createLinearGradient(0,0,0,hy);
-    g.addColorStop(0.00,'#1a2246'); g.addColorStop(0.28,'#35335f'); g.addColorStop(0.48,'#6b5480');
-    g.addColorStop(0.64,'#a85f78'); g.addColorStop(0.78,'#d97a5f'); g.addColorStop(0.90,'#f2a862');
-    g.addColorStop(0.97,'#ffc978'); g.addColorStop(1.00,'#ffe3a6');
-    ctx.fillStyle = g; ctx.fillRect(0,0,W,hy);
-    let hz = ctx.createLinearGradient(0,hy-H*0.30,0,hy);
-    hz.addColorStop(0,'rgba(234,182,152,0)'); hz.addColorStop(0.6,'rgba(240,192,152,0.10)'); hz.addColorStop(1,'rgba(255,214,160,0.32)');
-    ctx.fillStyle = hz; ctx.fillRect(0,hy-H*0.30,W,H*0.30);
-    const hg = ctx.createLinearGradient(0,hy-H*0.10,0,hy);
-    hg.addColorStop(0,'rgba(255,222,164,0)'); hg.addColorStop(1,'rgba(255,232,184,0.55)');
-    ctx.fillStyle = hg; ctx.fillRect(0,hy-H*0.10,W,H*0.10);
-  }
-  function sunDraw(t){
-    const bob = rm?0:Math.sin(t*0.0002)*H*0.004;
-    const y = sun.y+bob;
-    ctx.save(); ctx.globalCompositeOperation='lighter';
-    let b = ctx.createRadialGradient(sun.x,y,0,sun.x,y,sun.r*14);
-    b.addColorStop(0,'rgba(255,222,150,0.30)'); b.addColorStop(0.22,'rgba(255,192,122,0.16)');
-    b.addColorStop(0.55,'rgba(240,150,110,0.05)'); b.addColorStop(1,'rgba(240,150,110,0)');
-    ctx.fillStyle = b; ctx.beginPath(); ctx.arc(sun.x,y,sun.r*14,0,6.283); ctx.fill();
-    ctx.restore();
-    let g = ctx.createRadialGradient(sun.x,y,0,sun.x,y,sun.r*8);
-    g.addColorStop(0,'rgba(255,244,210,0.6)'); g.addColorStop(0.18,'rgba(255,208,140,0.38)');
-    g.addColorStop(0.5,'rgba(244,150,110,0.13)'); g.addColorStop(1,'rgba(244,150,110,0)');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(sun.x,y,sun.r*8,0,6.283); ctx.fill();
-    g = ctx.createRadialGradient(sun.x,y,0,sun.x,y,sun.r);
-    g.addColorStop(0,'#fff9ea'); g.addColorStop(0.6,'#ffe9bb'); g.addColorStop(1,'#ffcf82');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(sun.x,y,sun.r,0,6.283); ctx.fill();
-  }
-  function cloudsDraw(t){
-    ctx.save(); ctx.filter = 'blur('+(H*0.011)+'px)';
-    for(const c of clouds){
-      if(!rm) c.x += c.spd; if(c.x-c.w*2>W) c.x = -c.w*2;
-      const dx = c.x-sun.x, near = Math.max(0,1-Math.abs(dx)/(W*0.6));
-      const topR = lerp(212,238,near)|0, topG = lerp(196,224,near)|0, topB = lerp(190,206,near)|0;
-      const g = ctx.createLinearGradient(0,c.y-c.h*1.1,0,c.y+c.h*1.4);
-      g.addColorStop(0,`rgba(${topR},${topG},${topB},0)`);
-      g.addColorStop(0.35,`rgba(${topR},${topG},${topB},${(c.a+near*0.08).toFixed(3)})`);
-      g.addColorStop(0.72,`rgba(255,${(196+near*22)|0},${(150+near*20)|0},${(c.a*0.9+near*0.1).toFixed(3)})`);
-      g.addColorStop(1,'rgba(255,190,140,0)');
-      ctx.fillStyle = g;
-      for(const bl of c.blobs){ ctx.beginPath(); ctx.ellipse(c.x+bl.dx, c.y+bl.dy, bl.rw, bl.rh, 0, 0, 6.283); ctx.fill(); }
-    }
-    ctx.restore();
-  }
-  function sea(){
-    const hy = sun.hy;
-    const g = ctx.createLinearGradient(0,hy,0,H);
-    g.addColorStop(0.00,'#f0c07d'); g.addColorStop(0.06,'#d59a72'); g.addColorStop(0.20,'#8a6b7e');
-    g.addColorStop(0.48,'#423a58'); g.addColorStop(0.78,'#241f38'); g.addColorStop(1.00,'#141122');
-    ctx.fillStyle = g; ctx.fillRect(0,hy,W,H-hy);
-  }
-  function ripplesDraw(t){
-    ctx.save(); ctx.strokeStyle = '#ffdca0'; ctx.lineWidth = DPR;
-    for(const r of ripples){
-      ctx.globalAlpha = r.a*(rm?1:(0.7+0.3*Math.sin(t*0.001+r.drift)));
-      ctx.beginPath(); ctx.moveTo(0,r.y); ctx.lineTo(W,r.y); ctx.stroke();
-    }
-    ctx.restore();
-  }
-  function glitter(t){
-    ctx.save(); ctx.globalCompositeOperation = 'lighter';
-    for(const s of glints){
-      const a = rm?s.base*0.7:s.base*(0.4+0.6*Math.abs(Math.sin(t*0.001*s.sp+s.ph)));
-      ctx.fillStyle = `rgba(255,222,150,${a})`;
-      ctx.fillRect(s.x-s.len/2, s.y, s.len, DPR*1.4);
-    }
-    ctx.restore();
-  }
-  function land(){
-    const hy = sun.hy;
-    ctx.fillStyle = 'rgba(255,232,182,0.55)'; ctx.fillRect(0,hy-DPR*0.6,W,DPR*1.5);
-    ctx.fillStyle = 'rgba(26,20,36,0.88)';
-    ctx.beginPath(); ctx.moveTo(0,hy); ctx.lineTo(0,hy-H*0.03);
-    ctx.bezierCurveTo(W*0.07,hy-H*0.052, W*0.19,hy-H*0.010, W*0.30,hy); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = 'rgba(30,24,42,0.82)';
-    ctx.beginPath(); ctx.moveTo(sun.x-sun.r*2.4,hy);
-    ctx.quadraticCurveTo(sun.x-sun.r*1.5,hy-sun.r*0.55,sun.x-sun.r*0.7,hy); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = 'rgba(34,27,46,0.5)';
-    ctx.beginPath(); ctx.moveTo(W,hy); ctx.lineTo(W,hy-H*0.022);
-    ctx.bezierCurveTo(W*0.9,hy-H*0.03, W*0.82,hy-H*0.006, W*0.76,hy); ctx.closePath(); ctx.fill();
-    // three crosses (Calvary) — subtle dusk silhouette on a distant hill, left
-    const cx = W*0.15, hillW = W*0.075, hillH = H*0.024;
-    ctx.fillStyle = 'rgba(24,18,34,0.9)';
-    ctx.beginPath(); ctx.moveTo(cx-hillW,hy); ctx.quadraticCurveTo(cx,hy-hillH, cx+hillW,hy); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = 'rgba(20,15,30,0.92)';
-    const crest = hy-hillH*0.72, post = Math.max(1,H*0.0013);
-    function cross(x,ch,drop){
-      const foot = crest+drop, armW = ch*0.30, armY = foot-ch*0.72;
-      ctx.fillRect(x-post/2, foot-ch, post, ch);
-      ctx.fillRect(x-armW/2, armY, armW, Math.max(1,post*0.85));
-    }
-    const chC = H*0.028;
-    cross(cx-hillW*0.44, chC*0.7, hillH*0.22);
-    cross(cx+hillW*0.44, chC*0.7, hillH*0.22);
-    cross(cx, chC, 0);
-  }
-  function birdsDraw(t){
-    if(rm) return; ctx.save(); ctx.strokeStyle = 'rgba(28,20,34,0.45)'; ctx.lineWidth = DPR; ctx.lineCap = 'round';
-    for(const b of birds){ b.x += b.spd; if(b.x>W*0.9) b.x = W*0.06;
-      const flap = Math.sin(t*0.004+b.ph)*b.s*0.35;
-      ctx.beginPath(); ctx.moveTo(b.x-b.s,b.y);
-      ctx.quadraticCurveTo(b.x-b.s*0.4,b.y-b.s*0.55+flap,b.x,b.y);
-      ctx.quadraticCurveTo(b.x+b.s*0.4,b.y-b.s*0.55+flap,b.x+b.s,b.y); ctx.stroke();
-    } ctx.restore();
-  }
-  function foreground(t){
-    ctx.save();
-    for(const g of grass){
-      const sway = rm?0:Math.sin(t*0.0012+g.ph)*g.h*0.06;
-      ctx.strokeStyle = 'rgba(13,9,17,0.94)'; ctx.lineWidth = g.w; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(g.x,H+2);
-      ctx.quadraticCurveTo(g.x+g.lean*g.h*0.2, H-g.h*0.5, g.x+g.lean*g.h*0.4+sway, H-g.h); ctx.stroke();
-    }
-    for(const f of flowers){ ctx.globalAlpha = 0.85; ctx.fillStyle = f.c; ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,6.283); ctx.fill(); }
-    ctx.globalAlpha = 1; ctx.restore();
+  function pageProg(){
+    const d=Math.max(1, document.documentElement.scrollHeight-innerHeight);
+    return clamp((scrollY||pageYOffset)/d,0,1);
   }
   function draw(t){
     ctx.clearRect(0,0,W,H);
-    sky(); sunDraw(t); cloudsDraw(t); birdsDraw(t);
-    sea(); glitter(t); ripplesDraw(t); land(); foreground(t);
+    const pp = rm?0.55:pageProg();
+    const starA = rm?0.62:smooth(0.05,0.42,pp);          // stars appear once past the hero, deepen downward
+    if(starA>0.01) for(const s of stars){
+      const tw = rm?0.7:(0.55+0.45*Math.sin(t*s.sp+s.ph));
+      const a=(s.base+s.amp*tw)*starA; if(a<=0.01) continue;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.28);
+      ctx.fillStyle=`rgba(255,231,190,${a.toFixed(3)})`; ctx.fill();
+    }
+    if(rm) return;
+    const flyA=smooth(0.34,0.7,pp);                       // fireflies wake later, deep into the night
+    if(flyA>0.01){
+      ctx.save(); ctx.globalCompositeOperation='lighter';
+      for(const f of flies){
+        f.x+=f.vx; f.y+=f.vy;
+        if(f.y<-12){f.y=H+12;f.x=Math.random()*W;} if(f.x<-12)f.x=W+12; if(f.x>W+12)f.x=-12;
+        const tw=0.35+0.65*Math.abs(Math.sin(t*0.0016*f.sp+f.ph)), a=f.base*tw*flyA;
+        const gr=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r*3);
+        gr.addColorStop(0,`rgba(255,224,140,${a.toFixed(3)})`); gr.addColorStop(1,'rgba(255,210,120,0)');
+        ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(f.x,f.y,f.r*3,0,6.28); ctx.fill();
+      }
+      ctx.restore();
+    }
   }
-  function loop(t){ draw(t); rafId = requestAnimationFrame(loop); }
-  function start(){ if(rm || rafId!==null || W<4) return; rafId = requestAnimationFrame(loop); }
-  function stop(){ if(rafId!==null){ cancelAnimationFrame(rafId); rafId = null; } }
+  function loop(t){ draw(t); rafId=requestAnimationFrame(loop); }
+  function start(){ if(rm||rafId!==null) return; rafId=requestAnimationFrame(loop); }
+  function stop(){ if(rafId!==null){ cancelAnimationFrame(rafId); rafId=null; } }
+  addEventListener('resize',()=>{ init(); if(rm) draw(0); });
+  init();
+  if(rm){ draw(0); return; }
+  let ticking=false;
+  function frame(){ ticking=false;
+    const past = hero ? hero.getBoundingClientRect().bottom < innerHeight*0.96 : true;
+    if(past && !document.hidden) start(); else stop();
+  }
+  function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(frame); } }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll,{passive:true});
+  document.addEventListener('visibilitychange',frame);
+  frame();
+})();
+
+/* Hero — painterly coastline: overlays the painting with birds, sun-on-water twinkle and
+   dusk fireflies, and drives the sunset→night grade veil (--hp) as you scroll through it.
+   Nothing is redrawn from the painting — these are transparent overlays aligned to it. */
+(function(){
+  const hero = document.querySelector('.coast-hero');
+  const cv   = document.querySelector('.hero-fx');
+  const img  = document.querySelector('.hero-img');
+  const nav  = document.querySelector('.coast-nav');
+  if(!hero || !cv) return;
+  const ctx = cv.getContext('2d');
+  const rm  = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const IMG_W = 2880, IMG_H = 1607;          // natural size of coast-web.jpg
+  const SUN = {x:0.265, y:0.312};            // sun / waterline focal (fraction of the painting)
+  const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+  const smooth=(a,b,x)=>{ x=clamp((x-a)/(b-a),0,1); return x*x*(3-2*x); };
+  let W,H,DPR, glints=[], birds=[], flies=[], rafId=null;
+
+  // object-fit:cover mapping — where a painting-fraction lands on the canvas (matches the <img>)
+  const cover = {dw:0,dh:0,ox:0,oy:0};
+  function computeCover(){
+    let px=0.5, py=0.46;
+    if(img){ const op=getComputedStyle(img).objectPosition.split(' ');
+      if(op[0]) px=parseFloat(op[0])/100; if(op[1]!==undefined&&op[1]!=='') py=parseFloat(op[1])/100; }
+    const s=Math.max(W/IMG_W, H/IMG_H);
+    cover.dw=IMG_W*s; cover.dh=IMG_H*s; cover.ox=(W-cover.dw)*px; cover.oy=(H-cover.dh)*py;
+  }
+  const mapX=fx=>cover.ox+fx*cover.dw;
+  const mapY=fy=>cover.oy+fy*cover.dh;
+
+  function resize(){
+    DPR=Math.min(devicePixelRatio||1,2);
+    const w=cv.clientWidth||innerWidth, h=cv.clientHeight||innerHeight;
+    W=cv.width=Math.round(w*DPR); H=cv.height=Math.round(h*DPR);
+    if(W<4||H<4) return;
+    computeCover(); build();
+    if(rm) draw(0);
+  }
+  function build(){
+    const sx=mapX(SUN.x), sy=mapY(SUN.y), rad=cover.dh*0.045;
+    glints=[];
+    for(let i=0;i<58;i++){
+      const p=Math.pow(Math.random(),0.72);          // denser near the horizon, spreads downward
+      const y=sy+p*cover.dh*0.155;
+      const spread=rad*(0.4+p*2.6);
+      glints.push({ x:sx+(Math.random()-0.5)*spread, y,
+        len:rad*(0.1+Math.random()*0.42)*(0.55+p), ph:Math.random()*6.28,
+        sp:0.5+Math.random()*1.7, base:0.16+Math.random()*0.48 });
+    }
+    birds=[];
+    for(let i=0;i<4;i++){
+      birds.push({ x:mapX(0.44+Math.random()*0.38), y:mapY(0.07+Math.random()*0.12),
+        s:cover.dh*0.012, spd:(0.14+Math.random()*0.16)*DPR, ph:Math.random()*6.28,
+        dir:Math.random()<0.5?1:-1 });
+    }
+    flies=[];
+    for(let i=0;i<15;i++){
+      flies.push({ x:Math.random()*W, y:mapY(0.72+Math.random()*0.24),
+        r:DPR*(0.9+Math.random()*1.3), ph:Math.random()*6.28, sp:0.6+Math.random()*1.1,
+        vx:(Math.random()-0.5)*0.12*DPR, vy:-(0.04+Math.random()*0.09)*DPR, base:0.4+Math.random()*0.5 });
+    }
+  }
+  function heroProg(){
+    const h=hero.offsetHeight||innerHeight;
+    return clamp((scrollY||pageYOffset)/(h*0.82),0,1);   // fully graded a touch before the hero leaves
+  }
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    const hp = rm?0:heroProg();
+    if(!rm) hero.style.setProperty('--hp', hp.toFixed(3));
+
+    // sun-on-water twinkle — fades out as the sun "sets" into the grade
+    const glintA = rm?0.5:(1-smooth(0,0.7,hp));
+    if(glintA>0.01){
+      ctx.save(); ctx.globalCompositeOperation='lighter';
+      for(const g of glints){
+        const tw=rm?0.6:(0.35+0.65*Math.abs(Math.sin(t*0.001*g.sp+g.ph)));
+        ctx.fillStyle=`rgba(255,224,150,${(g.base*tw*glintA).toFixed(3)})`;
+        ctx.fillRect(g.x-g.len/2, g.y, g.len, DPR*1.5);
+      }
+      ctx.restore();
+    }
+    // birds drifting across the sky
+    ctx.save(); ctx.strokeStyle='rgba(24,18,32,0.5)'; ctx.lineWidth=DPR; ctx.lineCap='round';
+    for(const b of birds){
+      if(!rm){ b.x+=b.spd*b.dir;
+        if(b.dir>0 && b.x>W*1.06) b.x=-W*0.06; if(b.dir<0 && b.x<-W*0.06) b.x=W*1.06; }
+      const flap=rm?0:Math.sin(t*0.005+b.ph)*b.s*0.4;
+      ctx.beginPath(); ctx.moveTo(b.x-b.s,b.y);
+      ctx.quadraticCurveTo(b.x-b.s*0.4,b.y-b.s*0.6+flap,b.x,b.y);
+      ctx.quadraticCurveTo(b.x+b.s*0.4,b.y-b.s*0.6+flap,b.x+b.s,b.y); ctx.stroke();
+    }
+    ctx.restore();
+    // dusk fireflies over the wildflowers — wink on as the hero darkens
+    const flyA=rm?0:smooth(0.14,0.62,hp);
+    if(flyA>0.01){
+      ctx.save(); ctx.globalCompositeOperation='lighter';
+      for(const f of flies){
+        f.x+=f.vx; f.y+=f.vy;
+        if(f.y<mapY(0.66)){ f.y=mapY(0.96); f.x=Math.random()*W; }
+        if(f.x<0)f.x=W; if(f.x>W)f.x=0;
+        const tw=0.35+0.65*Math.abs(Math.sin(t*0.0016*f.sp+f.ph)), a=f.base*tw*flyA;
+        const gr=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r*3.2);
+        gr.addColorStop(0,`rgba(255,226,140,${a.toFixed(3)})`); gr.addColorStop(1,'rgba(255,210,120,0)');
+        ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(f.x,f.y,f.r*3.2,0,6.28); ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+  function loop(t){ draw(t); rafId=requestAnimationFrame(loop); }
+  function start(){ if(rm||rafId!==null||W<4) return; rafId=requestAnimationFrame(loop); }
+  function stop(){ if(rafId!==null){ cancelAnimationFrame(rafId); rafId=null; } }
 
   addEventListener('resize', resize);
   resize();
-  if(!rm) start();
+  if(rm){ hero.style.setProperty('--hp','0.1'); draw(0); }   // gentle static grade, no scroll linkage
+  else start();
 
-  /* Nav frost + perf guard: pause the scene once the hero is scrolled past / tab hidden */
-  let ticking = false;
-  function onScrollFrame(){
-    ticking = false;
-    const bottom = hero.getBoundingClientRect().bottom;
+  /* Nav frost + perf guard: pause overlays once the hero is scrolled past / tab hidden */
+  let ticking=false;
+  function frame(){
+    ticking=false;
+    const bottom=hero.getBoundingClientRect().bottom;
     if(nav) nav.classList.toggle('scrolled', bottom < 72);
     if(rm) return;
-    if(bottom <= 0) stop();
-    else if(!document.hidden) start();
+    if(bottom<=0) stop(); else if(!document.hidden) start();
   }
-  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(onScrollFrame); } }
+  function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(frame); } }
   addEventListener('scroll', onScroll, {passive:true});
   addEventListener('resize', onScroll, {passive:true});
-  document.addEventListener('visibilitychange', ()=>{
-    if(rm) return;
-    if(document.hidden) stop();
-    else if(hero.getBoundingClientRect().bottom > 0) start();
-  });
-  onScrollFrame();
+  document.addEventListener('visibilitychange', ()=>{ if(rm) return;
+    if(document.hidden) stop(); else if(hero.getBoundingClientRect().bottom>0) start(); });
+  frame();
 })();
 
 /* Scroll fade-up */

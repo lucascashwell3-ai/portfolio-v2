@@ -1,11 +1,10 @@
-# OS
+# ── Internal working docs — kept LOCALLY, never published to this PUBLIC site repo ──
+STATUS.md
+DEPLOY.md
+DESIGN_SESSION_PROMPT.md
+anti-ai-slop-agreement.md
+/design/
+/archive/
+
+# OS / editor
 .DS_Store
-Thumbs.db
-# Editors
-.vscode/
-.idea/
-*.swp
-# Deps / build
-node_modules/
-dist/
-.vercel/
