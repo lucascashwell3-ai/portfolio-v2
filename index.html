@@ -315,6 +315,22 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .pmeter .cap { margin-top:11px; font-size:.75rem; color:var(--ink-muted); display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
 .pmeter .cap b { color:var(--ink); font-weight:600; }
 
+/* Modelproof "buy zone" — price vs capability scatter (real data, labels-free = neutral) */
+.buyzone { border-radius:16px; padding:22px 24px; background:rgba(9,7,13,.55); border:1px solid rgba(255,246,232,.08); }
+.buyzone .bz-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+.buyzone .bz-head .t { font-family:var(--sans); font-size:.6rem; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint); }
+.buyzone .bz-head b { font-family:var(--serif); font-weight:400; font-size:1.05rem; color:var(--gold-hi); }
+.buyzone .plot { position:relative; margin:14px 0 4px; }
+.buyzone svg { display:block; width:100%; height:auto; overflow:visible; }
+.buyzone .zone { fill:rgba(240,190,90,.06); stroke:rgba(240,190,90,.28); stroke-width:1; stroke-dasharray:3 3; }
+.buyzone .dot { fill:rgba(226,180,120,.4); }
+.buyzone .dot.hl { fill:#fff1cf; }
+.buyzone .ring { fill:none; stroke:#f0be5a; stroke-width:1.2; opacity:.85; }
+.buyzone .zlab { font-family:var(--sans); font-size:8px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; fill:var(--gold-hi); }
+.buyzone .ax { display:flex; justify-content:space-between; font-size:.64rem; color:var(--ink-faint); }
+.buyzone .foot { font-size:.66rem; color:var(--ink-faint); margin-top:12px; }
+.buyzone .foot b { color:var(--ink); font-weight:600; }
+
 /* ══════════════════════ PROJECT CARDS ══════════════════════ */
 .proj-card {
   padding: 28px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 16px;
@@ -407,7 +423,7 @@ footer a { color: var(--gold-mid); }
   <div class="coast-hero__inner">
     <span class="eyebrow form-in">Portfolio · Lucas Cashwell</span>
     <h1 class="wordmark form-in d1">Proof</h1>
-    <p class="tagline form-in d2"><b>Everything I've actually built — led by DATproof, my flagship.</b></p>
+    <p class="tagline form-in d2"><b>Everything I've actually built — led by DATproof and Modelproof, my flagships.</b></p>
     <div class="cta-row form-in d3">
       <a class="btn-primary" href="#projects">See the proof <span aria-hidden="true">→</span></a>
       <a class="btn-ghost" href="#contact">Say hello</a>
@@ -420,7 +436,7 @@ footer a { color: var(--gold-mid); }
   <div class="wrap">
     <span class="eyebrow fade-up">Projects</span>
     <h2 class="fade-up">Things I've built</h2>
-    <p class="section-intro fade-up">DATproof is the flagship. Around it: a developer tool that ships on npm, a full-stack app I built to learn on, and a few earlier finance prototypes.</p>
+    <p class="section-intro fade-up">Two flagships lead the work — <b style="color:var(--ink);font-weight:600">DATproof</b> and <b style="color:var(--ink);font-weight:600">Modelproof</b>, siblings built on one rule: every number is sourced, nothing is guessed. Around them: a developer tool that ships on npm, a full-stack app I built to learn on, and a few earlier finance prototypes.</p>
 
     <!-- ── DATproof — FLAGSHIP ── -->
     <div class="flagship fade-up">
@@ -453,6 +469,64 @@ footer a { color: var(--gold-mid); }
             <div class="track"><div class="mass"></div><div class="lit"></div></div>
             <div class="cap"><span>0 of <b>1,100,000&nbsp;BTC</b> provable today</span><span>rebuilt nightly</span></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modelproof — FLAGSHIP (sibling to DATproof) ── -->
+    <div class="flagship fade-up">
+      <div class="flag-grid">
+        <div class="flag-copy">
+          <span class="flag-eyebrow"><span class="live"></span>Flagship · Live · independent</span>
+          <h3>Modelproof</h3>
+          <p class="lead">Which AI model should you actually use? A calm decision tool — tell it your task, or the lab you already pay for, and get a straight answer. Not a benchmark race; the point is the decision.</p>
+          <ul class="flag-points">
+            <li><b>Two ways in.</b> Pick by task — what you're doing, and how you weigh cost vs. quality — or by lab, if you're already locked into one. You get a top pick plus runners-up, in plain English.</li>
+            <li><b>Sourced, never guessed.</b> Pricing is verified against vendor pages, every benchmark carries a confidence flag, and a blank means "not reliably sourced" — the same discipline as DATproof.</li>
+            <li><b>Independent.</b> Not sponsored by, or advertising for, any lab — models are ranked on merit and cost only.</li>
+          </ul>
+          <div class="chips" style="margin-top:18px">
+            <span class="chip">Vanilla JS</span><span class="chip">Client-side</span><span class="chip">21 models · 9 vendors</span><span class="chip">Static site</span>
+          </div>
+          <div class="flag-links">
+            <a class="proj-link" href="https://lucascashwell3-ai.github.io/modelproof/" target="_blank" rel="noopener">Live site ↗</a>
+            <a class="proj-link" href="https://github.com/lucascashwell3-ai/modelproof" target="_blank" rel="noopener">GitHub ↗</a>
+          </div>
+        </div>
+
+        <div class="buyzone" aria-label="The buy zone: 21 AI models plotted by price versus capability; cheap and capable models sit top-left">
+          <div class="bz-head"><span class="t">The buy zone · price vs capability</span><b>21 models</b></div>
+          <div class="plot">
+            <svg viewBox="0 0 260 150" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+              <rect class="zone" x="14" y="16" width="124" height="82" rx="6"/>
+              <text class="zlab" x="18" y="12" style="fill:var(--ink-faint)">capability ↑</text>
+              <circle class="dot" cx="20" cy="130" r="2.4"/>
+              <circle class="dot" cx="49" cy="121" r="2.4"/>
+              <circle class="dot" cx="63" cy="74" r="2.4"/>
+              <circle class="dot" cx="82" cy="69" r="2.4"/>
+              <circle class="dot" cx="106" cy="97" r="2.4"/>
+              <circle class="dot" cx="142" cy="55" r="2.4"/>
+              <circle class="dot" cx="144" cy="88" r="2.4"/>
+              <circle class="dot" cx="144" cy="57" r="2.4"/>
+              <circle class="dot" cx="144" cy="71" r="2.4"/>
+              <circle class="dot" cx="148" cy="83" r="2.4"/>
+              <circle class="dot" cx="152" cy="69" r="2.4"/>
+              <circle class="dot" cx="161" cy="48" r="2.4"/>
+              <circle class="dot" cx="173" cy="43" r="2.4"/>
+              <circle class="dot" cx="173" cy="53" r="2.4"/>
+              <circle class="dot" cx="173" cy="41" r="2.4"/>
+              <circle class="dot" cx="182" cy="39" r="2.4"/>
+              <circle class="dot" cx="211" cy="34" r="2.4"/>
+              <circle class="dot" cx="211" cy="50" r="2.4"/>
+              <circle class="dot" cx="211" cy="32" r="2.4"/>
+              <circle class="dot" cx="240" cy="20" r="2.4"/>
+              <circle class="ring" cx="110" cy="53" r="8"/>
+              <circle class="dot hl" cx="110" cy="53" r="4.2"/>
+              <text class="zlab" x="122" y="50">value</text>
+            </svg>
+          </div>
+          <div class="ax"><span>← cheaper</span><span>pricier →</span></div>
+          <div class="foot">Top-left = cheap <b>and</b> capable. Pricing verified · benchmarks flagged · blank = not sourced.</div>
         </div>
       </div>
     </div>
