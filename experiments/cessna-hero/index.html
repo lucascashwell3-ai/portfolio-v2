@@ -24,8 +24,8 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 /* painterly vignette + warm grade over the render */
 #grade{position:fixed;inset:0;pointer-events:none;z-index:2;
   background:
-    radial-gradient(120% 90% at 50% 42%, transparent 55%, rgba(16,8,20,.38) 100%),
-    linear-gradient(180deg, rgba(42,30,70,.10) 0%, transparent 30%, transparent 72%, rgba(60,26,20,.16) 100%);}
+    radial-gradient(120% 90% at 50% 42%, transparent 55%, rgba(16,8,20,.30) 100%),
+    linear-gradient(180deg, rgba(42,30,70,.10) 0%, transparent 30%, transparent 72%, rgba(60,26,20,.10) 100%);}
 
 /* ── chrome ── */
 #ui{position:fixed;inset:0;z-index:3;pointer-events:none}
@@ -152,7 +152,7 @@ if(!webglOK()){
 const PAL = {
   skyZen:0x33355f, skyMid:0x9a5f74, skyHor:0xf7bd7d,
   sun:0xffcf9a, sunLight:0xffb26a,
-  seaDeep:0x232a54, seaLift:0xe8a06f,
+  seaDeep:0x27305e, seaLift:0xd394a0,
   fog:0xd99a6c,
   grass:0x8a9150, grassDry:0xa89a58, rock:0x6b5643, sand:0xe3c28c, dirt:0xc7a26b,
   cloud:0xffe9d8,
@@ -188,7 +188,7 @@ renderer.toneMappingExposure = 1.12;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(PAL.fog, 700, 3100);
+scene.fog = new THREE.Fog(PAL.fog, 950, 4300);
 const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.08, 12000);
 
 const sunLight = new THREE.DirectionalLight(PAL.sunLight, 2.7);
@@ -321,14 +321,14 @@ const waterMat = new THREE.ShaderMaterial({
       vec3 n = normalize(vN);
       vec3 V = normalize(cameraPosition - vW);
       float fres = pow(1.-max(dot(n,V),0.), 3.);
-      vec3 col = mix(uDeep, uLift, 0.18 + 0.62*fres);
+      vec3 col = mix(uDeep, uLift, 0.16 + 0.55*fres);
       vec3 H = normalize(uSun+V);
       float sp = pow(max(dot(n,H),0.), 260.);
       float sparkle = 0.55 + 0.9*hsh(floor(vW.xz*1.7)+floor(uTime*8.)*0.37);
       col += uSunCol * sp * sparkle * 2.1;
       /* broad golden path toward the sun */
       vec3 R = reflect(-V, n);
-      col += uSunCol * pow(max(dot(R,uSun),0.), 24.) * 0.22;
+      col += uSunCol * pow(max(dot(R,uSun),0.), 60.) * 0.38;
       gl_FragColor = vec4(col,1.);
       #include <fog_fragment>
     }`
@@ -382,7 +382,7 @@ function terrainH(x,z){
     else if(hy < 5) c.setHex(PAL.sand).lerp(new THREE.Color(PAL.grassDry), hy/5);
     else if(hy < 46) c.setHex(PAL.grass).lerp(new THREE.Color(PAL.grassDry), vnoise(cx*0.01,cz*0.01)*.8);
     else c.setHex(PAL.rock);
-    const j = 1 + (hash2(f,1)-.5)*0.12;
+    const j = 1 + (hash2(f,1)-.5)*0.06;
     for(let k=0;k<3;k++){ col[(f+k)*3]=c.r*j; col[(f+k)*3+1]=c.g*j; col[(f+k)*3+2]=c.b*j; }
   }
   ng.setAttribute('color', new THREE.BufferAttribute(col,3));
@@ -563,6 +563,31 @@ function addClick(id, x,y,z, r){
   }
 }
 
+/* — runway dressing: strip, centerline, threshold, edge cones, hangar, windsock — */
+{
+  const y = RUNWAY.y, cx=(RUNWAY.x0+RUNWAY.x1)/2;
+  // darker packed-dirt strip slightly above terrain (kills z-fight, reads as runway)
+  staticParts.push(bake(new THREE.BoxGeometry(RUNWAY.x1-RUNWAY.x0+30, .3, RUNWAY.w), 0x84653e,
+    cx, y+0.16, RUNWAY.z, 0,0,0, 1, .14));
+  // centerline dashes
+  for(let x=RUNWAY.x0; x<RUNWAY.x1; x+=18)
+    staticParts.push(bake(new THREE.BoxGeometry(8,.14,0.9), 0xd6c5a2, x, y+0.4, RUNWAY.z));
+  // threshold bars at the west (departure) end
+  for(const dz of [-6,-3.6,-1.2,1.2,3.6,6])
+    staticParts.push(bake(new THREE.BoxGeometry(7,.14,1.5), 0xd6c5a2, RUNWAY.x0+6, y+0.4, RUNWAY.z+dz));
+  // edge cones
+  for(let x=RUNWAY.x0; x<=RUNWAY.x1; x+=38) for(const s of [-1,1])
+    staticParts.push(bake(new THREE.ConeGeometry(.9,2.2,5), 0xe07840, x, y+1.2, RUNWAY.z+s*(RUNWAY.w/2+3)));
+  // little hangar north of the strip (kept small + far so it reads as scenery, not a wall)
+  staticParts.push(bake(new THREE.BoxGeometry(16,6,13), 0xa9805a, cx-30, y+3, RUNWAY.z-72, 0,0,0, 1, .1));
+  staticParts.push(bake(new THREE.CylinderGeometry(6.5,6.5,16,3,1,false,0,Math.PI), 0x855640,
+    cx-30, y+6, RUNWAY.z-72, 0,0,Math.PI/2, new THREE.Vector3(1,1,1.3), .08));
+  // windsock: pole + orange cone streaming with the sea breeze
+  staticParts.push(bake(new THREE.CylinderGeometry(.25,.35,9,5), 0xd8cbb2, RUNWAY.x0+14, y+4.5, RUNWAY.z-16));
+  staticParts.push(bake(new THREE.ConeGeometry(1.1,4.2,6), 0xe07840,
+    RUNWAY.x0+14+2.2, y+8.6, RUNWAY.z-16, 0,0,Math.PI/2, 1, .1));
+}
+
 /* merge all static baked parts → 1 draw call */
 scene.add(new THREE.Mesh(mergeGeos(staticParts), flatMat));
 
@@ -570,18 +595,18 @@ scene.add(new THREE.Mesh(mergeGeos(staticParts), flatMat));
 const clouds = [];
 {
   const cm = new THREE.MeshStandardMaterial({color:PAL.cloud, flatShading:true, roughness:1,
-    transparent:true, opacity:.92, emissive:0xd4886a, emissiveIntensity:.18});
+    transparent:true, opacity:.9, emissive:0xf0a070, emissiveIntensity:.34});
   for(let i=0;i<7;i++){
     const parts=[];
     const n=3+Math.floor(hash2(i,99)*3);
     for(let k=0;k<n;k++){
       parts.push(bake(new THREE.IcosahedronGeometry(14+hash2(i,k)*16, 0), 0xffffff,
         k*20-(n-1)*10+ (hash2(i,k+5)-.5)*16, (hash2(i,k+9)-.5)*8, (hash2(i,k+3)-.5)*18,
-        0,0,0, new THREE.Vector3(1.6,0.55,1)));
+        0,0,0, new THREE.Vector3(2.0,0.42,1)));
     }
     const m = new THREE.Mesh(mergeGeos(parts), cm);
     const a = i/7*Math.PI*2;
-    m.position.set(Math.cos(a)*(500+hash2(i,1)*700)-100, 300+hash2(i,2)*160, Math.sin(a)*(500+hash2(i,1)*700));
+    m.position.set(Math.cos(a)*(500+hash2(i,1)*700)-100, 390+hash2(i,2)*170, Math.sin(a)*(500+hash2(i,1)*700));
     m.userData.drift = 1.5+hash2(i,4)*2;
     scene.add(m); clouds.push(m);
   }
@@ -600,7 +625,8 @@ const cockpit = new THREE.Group();
 planeGroup.add(cockpit);
 let propDisc, propBlades, panelMat;
 {
-  const dark = new THREE.MeshStandardMaterial({color:0x241a14, roughness:.85, metalness:.1, flatShading:true});
+  const dark = new THREE.MeshStandardMaterial({color:0x241a14, roughness:.85, metalness:.1, flatShading:true,
+    emissive:0x140b06, emissiveIntensity:1});
   panelMat = dark;
   // instrument panel — a shape with two hoods
   const sh = new THREE.Shape();
@@ -627,7 +653,7 @@ let propDisc, propBlades, panelMat;
   });
   const gauges = new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.375),
     new THREE.MeshBasicMaterial({map:gaugeTex}));
-  gauges.position.set(0,-0.52,-0.86); gauges.rotation.x = -0.18;
+  gauges.position.set(0,-0.44,-0.84); gauges.rotation.x = -0.22;
   // yoke
   const yoke = new THREE.Group();
   const grip = new THREE.Mesh(new THREE.TorusGeometry(0.16,0.022,7,22,Math.PI*1.25), dark);
@@ -648,11 +674,11 @@ let propDisc, propBlades, panelMat;
   const wing = new THREE.Mesh(new THREE.BoxGeometry(7,0.09,1.7), dark);
   wing.position.set(0,0.95,-0.55);
   const strutL = new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,1.9,6), dark);
-  strutL.position.set(-1.35,0.15,-0.55); strutL.rotation.z = 0.72; strutL.rotation.x=0.1;
-  const strutR = strutL.clone(); strutR.position.x=1.35; strutR.rotation.z=-0.72;
+  strutL.position.set(-1.62,0.10,-0.40); strutL.rotation.z = 0.58; strutL.rotation.x=0.1;
+  const strutR = strutL.clone(); strutR.position.x=1.62; strutR.rotation.z=-0.58;
   // cowling nose
-  const cowl = new THREE.Mesh(new THREE.BoxGeometry(1.5,0.5,1.1), dark);
-  cowl.position.set(0,-0.72,-1.75); cowl.rotation.x=0.08;
+  const cowl = new THREE.Mesh(new THREE.BoxGeometry(1.5,0.4,1.1), dark);
+  cowl.position.set(0,-0.80,-1.75); cowl.rotation.x=0.08;
   // prop: blur disc + startup blades
   const propTex = canvasTex(256,256,(ctx)=>{
     ctx.clearRect(0,0,256,256);
@@ -666,7 +692,7 @@ let propDisc, propBlades, panelMat;
       ctx.lineTo(8,-118); ctx.quadraticCurveTo(16,-60,14,0); ctx.closePath(); ctx.fill();
     }
     ctx.setTransform(1,0,0,1,0,0);
-    ctx.strokeStyle='rgba(40,30,20,0.14)'; ctx.lineWidth=10;
+    ctx.strokeStyle='rgba(40,30,20,0.07)'; ctx.lineWidth=8;
     ctx.beginPath(); ctx.arc(128,128,100,0,7); ctx.stroke();
   });
   propDisc = new THREE.Mesh(new THREE.CircleGeometry(1.15,24),
@@ -725,7 +751,7 @@ function flyTo(id){
   S.mode = 'transit'; S.t = 0;
   hideCard();
   const d = Math.hypot(S.pos.x-p.pos[0], S.pos.z-p.pos[1]);
-  tweenOrbitTo({cx:p.pos[0], cz:p.pos[1], r:150, alt:92, w:0.26}, Math.min(9, 3.5 + d/220));
+  tweenOrbitTo({cx:p.pos[0], cz:p.pos[1], r:230, alt:126, w:0.17}, Math.min(9, 3.5 + d/220));
   setPills(id);
   caption(`En route · ${p.island}`);
 }
@@ -743,7 +769,7 @@ function skipIntro(){
   S.orbit = {...CRUISE_ORBIT}; S.theta = Math.PI*0.9;
   orbitPos(S.orbit, S.theta, S.pos); S.prevPos.copy(S.pos);
   S.rpm = 1; S.speed = S.orbit.r*S.orbit.w;
-  propDisc.material.opacity = 0.85; propBlades.visible = false;
+  propDisc.material.opacity = 0.55; propBlades.visible = false;
   document.getElementById('skip').classList.add('gone');
   document.getElementById('pills').classList.add('on');
   document.getElementById('hint').classList.add('on');
@@ -806,18 +832,19 @@ function flightStep(dt, t){
     S.speed = r*S.orbit.w;
   }
 
-  // derive orientation from motion
+  // derive orientation from motion (turn-rate capped so glitches can't slam the bank)
   _vel.subVectors(S.pos, S.prevPos);
   const hs = Math.hypot(_vel.x,_vel.z);
   if(hs > 0.0004){
     const targetHeading = Math.atan2(-_vel.x, -_vel.z);
     let dh = targetHeading - S.heading;
     while(dh> Math.PI) dh-=Math.PI*2; while(dh<-Math.PI) dh+=Math.PI*2;
-    S.heading += dh * Math.min(1, dt*6);
-    const turnRate = dh/Math.max(dt,1e-4);
-    const targetRoll = THREE.MathUtils.clamp(-turnRate*1.9, -0.55, 0.55);
-    S.roll += (targetRoll - S.roll)*Math.min(1,dt*2.2);
-    const targetPitch = Math.atan2(_vel.y, Math.max(hs,0.001))*0.85;
+    let step = THREE.MathUtils.clamp(dh*Math.min(1,dt*6), -0.55*dt, 0.55*dt);
+    S.heading += step;
+    const turnRate = step/Math.max(dt,1e-4);
+    const targetRoll = THREE.MathUtils.clamp(-turnRate*1.5, -0.45, 0.45);
+    S.roll += (targetRoll - S.roll)*Math.min(1,dt*1.8);
+    const targetPitch = THREE.MathUtils.clamp(Math.atan2(_vel.y, Math.max(hs,0.001))*0.85, -0.34, 0.34);
     S.pitch += (targetPitch - S.pitch)*Math.min(1,dt*2.5);
   } else {
     S.roll *= 1-Math.min(1,dt*3); S.pitch *= 1-Math.min(1,dt*3);
@@ -835,16 +862,18 @@ function flightStep(dt, t){
   if(S.rpm>0.02){
     propBlades.visible = S.rpm < 0.45;
     propBlades.rotation.z += dt * (4 + S.rpm*90);
-    propDisc.material.opacity = THREE.MathUtils.clamp((S.rpm-0.3)*1.6, 0, 0.9);
+    propDisc.material.opacity = THREE.MathUtils.clamp((S.rpm-0.3)*1.6, 0, 0.55);
     propDisc.rotation.z -= dt*30*S.rpm;
   }
   cockpit.userData.yoke.rotation.z = S.roll*0.55;
 
-  // pilot head: user look + auto-bias toward orbited island
-  const wantBias = (S.mode==='orbit') ? 0.62 : 0;
+  // pilot head: user look + auto-bias toward orbited island (island sits to the plane's RIGHT in orbit)
+  const wantBias = (S.mode==='orbit') ? -1.05 : 0;   // island rides abeam-right in orbit; look out the right window
+  const wantPitchBias = (S.mode==='orbit') ? -0.32 : 0;
   S.lookBias += (wantBias - S.lookBias)*Math.min(1,dt*1.4);
-  head.rotation.y = look.yaw + S.lookBias;      // bias looks inward (orbit is CCW → island to the left? sign set below)
-  head.rotation.x = look.pitch + (S.mode==='intro'? introHeadPitch() : -0.06);
+  S.pitchBias = (S.pitchBias||0) + (wantPitchBias - (S.pitchBias||0))*Math.min(1,dt*1.4);
+  head.rotation.y = look.yaw + S.lookBias;
+  head.rotation.x = look.pitch + (S.mode==='intro'? introHeadPitch()-0.07 : -0.06 + S.pitchBias);
   head.position.y = 0.12 + (S.mode==='intro'? introHeadY() : 0);
 }
 function introHeadPitch(){ const k = smootherstep(S.t/2.4); return (1-k)*-0.45; }
@@ -879,14 +908,7 @@ function staticFocus(p){
     camera.lookAt(-180, 0, -60);
   }
 }
-if(reduced || S.mode==='static'){
-  cockpit.visible = false;
-  planeGroup.remove(head); scene.add(head); head.add(camera); // free camera
-  staticFocus(null);
-  document.getElementById('skip').classList.add('gone');
-  document.getElementById('pills').classList.add('on');
-  caption('Aerial view · motion reduced');
-}
+/* (activation of static mode happens after UI wiring — see end of §12) */
 
 /* ── 12. UI wiring ─────────────────────────────────────────────── */
 const pillsEl = document.getElementById('pills');
@@ -920,6 +942,16 @@ function caption(txt){
   if(txt===capText) return; capText = txt;
   if(!txt){ capEl.classList.remove('on'); return; }
   capEl.textContent = txt; capEl.classList.add('on');
+}
+
+/* reduced-motion: static aerial view with clickable landmarks */
+if(reduced || S.mode==='static'){
+  cockpit.visible = false;
+  planeGroup.remove(head); scene.add(head); head.add(camera); // free camera
+  staticFocus(null);
+  document.getElementById('skip').classList.add('gone');
+  document.getElementById('pills').classList.add('on');
+  caption('Aerial view · motion reduced');
 }
 
 /* click islands directly */
@@ -973,11 +1005,12 @@ muteBtn.addEventListener('click', ()=>{
 
 /* ── 14. loop, resize, visibility ──────────────────────────────── */
 const clock = new THREE.Clock();
-let raf = null, running = false;
+let raf = null, running = false, simT = 0;   // simT: monotonic sim clock (survives ff() fast-forwards)
 function frame(){
   raf = requestAnimationFrame(frame);
   const dt = Math.min(clock.getDelta(), 0.05);
-  const t = clock.elapsedTime;
+  simT += dt;
+  const t = simT;
   waterUniforms.uTime.value = t;
   for(const s of dynamic.spinners) s.obj.rotation.y += s.speed*dt;
   for(const p of dynamic.pulsers) p.mat.emissiveIntensity = p.base + p.amp*Math.sin(t*p.rate*Math.PI);
@@ -1007,10 +1040,10 @@ window.__cessna = {
   get state(){ return S.mode; },
   S, flyTo, resumeCruise, skipIntro,
   setLook(yaw,pitch){ look.tx=-yaw; look.ty=-pitch; },
-  ff(sec){ // fast-forward the sim deterministically (for screenshots)
+  ff(sec){ // fast-forward the sim deterministically (for screenshots) — advances the same simT the RAF loop uses
     for(let i=0;i<sec*60;i++){
-      const t = clock.elapsedTime + i/60;
-      lookStep(1/60); flightStep(1/60, t);
+      simT += 1/60;
+      lookStep(1/60); flightStep(1/60, simT);
     }
   },
 };
