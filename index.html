@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Proof — Lucas Cashwell</title>
-<meta name="description" content="Proof — verifiable work, not vibes. A record of what Lucas Cashwell has built, led by DATproof, the flagship." />
+<meta name="description" content="Proof — verifiable work, not vibes. A record of what Lucas Cashwell has built, led by the co-flagships Modelproof and DATproof." />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Cg%20fill='%23f0b95f'%3E%3Crect%20x='43'%20y='28'%20width='14'%20height='44'%20rx='1.5'/%3E%3Crect%20x='28'%20y='43'%20width='44'%20height='14'%20rx='1.5'/%3E%3Crect%20x='12'%20y='12'%20width='11'%20height='11'%20rx='1.5'/%3E%3Crect%20x='77'%20y='12'%20width='11'%20height='11'%20rx='1.5'/%3E%3Crect%20x='12'%20y='77'%20width='11'%20height='11'%20rx='1.5'/%3E%3Crect%20x='77'%20y='77'%20width='11'%20height='11'%20rx='1.5'/%3E%3C/g%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,6 +41,11 @@
   --maxw: 960px;
   --serif: "Fraunces", Georgia, serif;
   --sans:  "Inter", system-ui, sans-serif;
+
+  /* Spring physics compiled to pure-CSS linear() (kinetics-style; no JS).
+     soft = tight settle w/ small overshoot · pop = stampy overshoot */
+  --spring-soft: linear(0, 0.0796 6.3%, 0.2511 12.5%, 0.4444 18.8%, 0.6209 25%, 0.7639 31.3%, 0.8695 37.5%, 0.9412 43.8%, 0.9857 50%, 1.0101 56.3%, 1.0209 62.5%, 1.0234 68.8%, 1.0213 75%, 1.0172 81.3%, 1.0127 87.5%, 1.0086 93.8%, 1.0053);
+  --spring-pop: linear(0, 0.1686 6.3%, 0.5158 12.5%, 0.8547 18.8%, 1.0851 25%, 1.1856 31.3%, 1.1838 37.5%, 1.1266 43.8%, 1.0564 50%, 1.0006 56.3%, 0.9698 62.5%, 0.9621 68.8%, 0.9695 75%, 0.9829 81.3%, 0.9955 87.5%, 1.0038 93.8%, 1.0072);
 }
 
 /* ══════════════════════ GOLD METAL (animated specular sweep) ══════════════════════ */
@@ -94,12 +99,20 @@ canvas#stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
   letter-spacing: .22em; text-transform: uppercase; color: var(--gold-hi); margin-bottom: 14px;
 }
 
-/* ══════════════════════ FADE-IN ANIMATION ══════════════════════ */
-.fade-up { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
-.fade-up.visible { opacity: 1; transform: none; }
-.fade-up:nth-child(2){transition-delay:.1s} .fade-up:nth-child(3){transition-delay:.2s} .fade-up:nth-child(4){transition-delay:.3s}
+/* ══════════ FADE-IN ANIMATION (gated on html.js — no JS, no hidden content) ══════════ */
+html.js .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+html.js .fade-up.visible { opacity: 1; transform: none; }
+html.js .fade-up:nth-child(2){transition-delay:.1s} html.js .fade-up:nth-child(3){transition-delay:.2s} html.js .fade-up:nth-child(4){transition-delay:.3s}
+
+/* Staggered word reveal on section headings (spans injected by JS only when motion is allowed) */
+.wr .w { display:inline-block; opacity:0; transform:translateY(.55em);
+  transition: opacity .45s ease, transform .8s cubic-bezier(.22,1,.36,1);
+  transition: opacity .45s ease, transform .8s var(--spring-soft);
+  transition-delay: calc(var(--wi) * 65ms); }
+.wr.visible .w { opacity:1; transform:none; }
+
 @media (prefers-reduced-motion:reduce) {
-  .fade-up { opacity:1; transform:none; transition:none; }
+  html.js .fade-up { opacity:1; transform:none; transition:none; }
   .gold-metal::after { animation:none; opacity:.22; }
 }
 
@@ -236,9 +249,11 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 /* ══════════════════════ DITHERED / HALFTONE CHART KIT (vanilla, in-file) ══════════════════════ */
 /* Reusable risograph/dither look: gold halftone dots on transparent. */
 .dcols { display:flex; align-items:flex-end; gap:5px; height:54px; }
-.dcols i { flex:1; height:var(--h,50%); border-radius:2px 2px 0 0;
+.dcols i { flex:1; height:var(--h,50%); border-radius:2px 2px 0 0; transform-origin:bottom;
   background-image:radial-gradient(var(--gold-hi) 1px, transparent 1.35px); background-size:4px 4px; background-position:bottom; }
 .dcols i.lo { opacity:.35; }
+html.js .dcols.rise i { animation:colrise .7s var(--spring-soft) backwards; animation-delay:calc(var(--d) * 55ms); }
+@keyframes colrise { from { transform:scaleY(.12); opacity:.25; } }
 
 /* secondary project cards: copy + dithered viz side-by-side */
 .pcard-grid { display:grid; grid-template-columns:1fr 250px; gap:30px; align-items:center; }
@@ -276,7 +291,7 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .mdash .spark { display:block; height:52px; }
 .mdash .foot { font-size:.62rem; color:var(--ink-faint); margin-top:11px; }
 
-/* ══════════════════════ FLAGSHIP (DATproof — the star) ══════════════════════ */
+/* ══════════════ FLAGSHIPS (Modelproof + DATproof — the co-stars) ══════════════ */
 .flagship { position:relative; margin-bottom:26px; padding:32px 34px; border-radius:22px;
   border:1px solid rgba(224,168,96,.30);
   background:radial-gradient(120% 130% at 100% 0%, rgba(224,168,96,.12), transparent 52%), var(--glass-bg);
@@ -295,25 +310,90 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .flag-points li b { color:var(--ink); font-weight:600; }
 .flag-links { display:flex; gap:8px; flex-wrap:wrap; margin-top:22px; }
 
-/* the dithered "proof stat" — 1.1M disclosed → 0% verifiable */
-.proofstat { border-radius:16px; padding:24px; background:rgba(9,7,13,.55); border:1px solid rgba(255,246,232,.08); }
-.proofstat .heads { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
-.proofstat .num { font-family:var(--serif); font-weight:400; line-height:.86; }
-.proofstat .disclosed .num { font-size:2rem; color:var(--ink); }
-.proofstat .zero { text-align:right; }
-.proofstat .zero .num { font-size:clamp(3.1rem,7vw,4.4rem);
-  background:linear-gradient(135deg,#f6c877,#e0a860); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.proofstat .k { font-family:var(--sans); font-size:.62rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; margin-top:9px; color:var(--ink-faint); line-height:1.4; }
-.proofstat .zero .k { color:var(--gold-hi); }
-.pmeter { margin-top:22px; }
-.pmeter .track { position:relative; height:44px; border-radius:6px; overflow:hidden;
-  background:rgba(255,246,232,.03); border:1px solid rgba(255,246,232,.07); }
-.pmeter .mass { position:absolute; inset:0;
-  background-image:radial-gradient(rgba(226,180,120,.5) 1px, transparent 1.5px); background-size:6px 6px; opacity:.5; }
-.pmeter .lit { position:absolute; left:0; top:0; bottom:0; width:2px;
-  background:linear-gradient(180deg,#fff1cf,#e0a860); box-shadow:0 0 10px rgba(240,190,90,.6); }
-.pmeter .cap { margin-top:11px; font-size:.75rem; color:var(--ink-muted); display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-.pmeter .cap b { color:var(--ink); font-weight:600; }
+/* ═══ DATproof — "the burden of proof" flip (the thesis in one gesture) ═══ */
+.burden { border-radius:16px; padding:22px 24px; background:rgba(9,7,13,.55); border:1px solid rgba(255,246,232,.08); transition:background .6s ease; }
+.burden.proof { background:rgba(6,5,12,.72); }
+.burden .lab { font-family:var(--sans); font-size:.6rem; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; display:flex; justify-content:space-between; gap:8px; }
+.burden .lab b { color:var(--gold-hi); font-weight:700; }
+.bp-toggle { position:relative; display:grid; grid-template-columns:1fr 1fr; border:1px solid rgba(255,246,232,.14); border-radius:999px; background:rgba(255,246,232,.04); cursor:pointer; user-select:none; -webkit-user-select:none; }
+.bp-toggle:focus-visible { outline:none; box-shadow:0 0 0 2px rgba(246,200,119,.55); }
+.bp-opt { position:relative; z-index:1; text-align:center; font-size:.72rem; font-weight:600; letter-spacing:.03em; padding:9px 8px; color:var(--ink-muted); transition:color .3s ease; white-space:nowrap; }
+.burden:not(.proof) .bp-word, .burden.proof .bp-proof { color:#ffe9c4; }
+.bp-knob { position:absolute; top:3px; bottom:3px; left:3px; width:calc(50% - 3px); border-radius:999px;
+  background:linear-gradient(135deg,rgba(246,200,119,.24),rgba(224,168,96,.14)); border:1px solid rgba(246,200,119,.4);
+  transition:transform .45s cubic-bezier(.22,1,.36,1); transition:transform .6s var(--spring-soft); will-change:transform; }
+.burden.proof .bp-knob { transform:translateX(100%); }
+.bp-fig { font-family:var(--serif); line-height:.9; margin-top:20px; }
+.bp-num { font-size:clamp(2.5rem,5.4vw,3.5rem); color:var(--ink); font-variant-numeric:tabular-nums; transition:color .5s ease; }
+.burden.proof .bp-num { color:#f2c67d; }
+.bp-unit { font-family:var(--sans); font-size:.95rem; color:var(--ink-muted); margin-left:6px; }
+.bp-caps { display:grid; margin-top:9px; font-size:.78rem; color:var(--ink-muted); }
+.bp-caps span { grid-area:1/1; transition:opacity .35s ease; }
+.bp-caps .c2 { opacity:0; }
+.burden.proof .c1 { opacity:0; } .burden.proof .c2 { opacity:1; }
+.bp-caps b { color:var(--ink); font-weight:600; }
+.bp-track { margin-top:18px; position:relative; height:38px; border-radius:6px; overflow:hidden; background:rgba(255,246,232,.03); border:1px solid rgba(255,246,232,.07); }
+.bp-mass { position:absolute; inset:0; background-image:radial-gradient(rgba(226,180,120,.5) 1px, transparent 1.5px); background-size:6px 6px; opacity:.55; transform-origin:left center;
+  transition:transform .7s cubic-bezier(.22,1,.36,1); transition:transform .9s var(--spring-soft); }
+.burden.proof .bp-mass { transform:scaleX(.004); }
+.bp-foot { margin-top:12px; font-size:.68rem; color:var(--ink-muted); }
+.bp-foot b { color:var(--gold-hi); font-weight:600; }
+
+/* ═══ Skillproof — grade stamp + receipt reveal ═══ */
+.receipt .rc-head { display:flex; align-items:center; gap:12px; }
+.grade-stamp { display:flex; align-items:center; justify-content:center; width:46px; height:46px; flex-shrink:0;
+  border-radius:10px; border:1.5px solid rgba(246,200,119,.55); background:rgba(246,200,119,.07);
+  color:#f6c877; font-family:var(--serif); font-size:1.65rem; font-weight:500;
+  transform:rotate(-3deg); box-shadow:inset 0 0 0 1px rgba(246,200,119,.12); }
+html.js .stamp-in .grade-stamp { animation:stamp .65s var(--spring-pop) both; }
+@keyframes stamp { from { transform:scale(1.8) rotate(-16deg); opacity:0; } to { transform:scale(1) rotate(-3deg); opacity:1; } }
+.rc-id { display:flex; flex-direction:column; line-height:1.35; min-width:0; }
+.rc-name { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.84rem; color:var(--ink); }
+.rc-sub { font-size:.67rem; color:var(--ink-muted); }
+.rc-btn { margin-left:auto; flex-shrink:0; font-family:var(--sans); font-size:.68rem; font-weight:600; letter-spacing:.05em;
+  color:var(--gold-mid); background:none; border:1px solid rgba(176,157,107,.3); border-radius:999px; padding:6px 13px; cursor:pointer;
+  transition:background .2s ease, color .2s ease, border-color .2s ease; }
+.rc-btn:hover { background:rgba(176,157,107,.1); color:var(--gold-hi); }
+.rc-btn:focus-visible { outline:none; box-shadow:0 0 0 2px rgba(246,200,119,.5); }
+.rc-body { display:grid; grid-template-rows:0fr; transition:grid-template-rows .45s cubic-bezier(.22,1,.36,1); transition:grid-template-rows .55s var(--spring-soft); }
+.receipt.open .rc-body { grid-template-rows:1fr; }
+.rc-inner { overflow:hidden; min-height:0; }
+.rc-row { display:flex; align-items:baseline; gap:10px; padding-top:10px; flex-wrap:wrap; }
+.rc-row:first-child { padding-top:14px; }
+.rc-dim { font-size:.68rem; font-weight:600; color:var(--ink); min-width:86px; }
+.rc-dots { display:inline-flex; gap:3px; }
+.rc-dots i { width:6px; height:6px; border-radius:2px; background:rgba(255,246,232,.12); }
+.rc-dots i.on { background:linear-gradient(135deg,#f6c877,#e0a860); }
+.rc-note { flex:1 1 100%; font-size:.7rem; color:var(--ink-muted); line-height:1.5; }
+
+/* ═══ Warden — terminal scan that types its findings ═══ */
+.term { padding:0; overflow:hidden; display:flex; flex-direction:column; }
+.term .tbar { display:flex; align-items:center; gap:6px; padding:10px 14px; background:rgba(255,246,232,.04); border-bottom:1px solid rgba(255,246,232,.07); }
+.term .tbar i { width:9px; height:9px; border-radius:50%; background:rgba(255,246,232,.14); }
+.term .tbar span { margin-left:6px; font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; }
+.term .tout { margin:0; padding:14px 16px 4px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.71rem; line-height:1.7; color:var(--ink-muted); min-height:214px; white-space:pre-wrap; word-break:break-word; }
+.term .tout .crit { color:#f5967c; }
+.term .tout .ok { color:#4bd18a; }
+.term .tout .gold { color:var(--gold-hi); }
+.term .tout .dim { color:#8d867a; }
+.term .caret { display:inline-block; width:7px; height:1em; vertical-align:-2px; background:var(--gold-hi); animation:caretblink 1s steps(1) infinite; }
+@keyframes caretblink { 50% { opacity:0; } }
+.t-replay { align-self:flex-end; margin:0 12px 11px; font-family:var(--sans); font-size:.66rem; font-weight:600; letter-spacing:.05em;
+  color:var(--ink-muted); background:none; border:1px solid rgba(255,246,232,.14); border-radius:999px; padding:5px 12px; cursor:pointer;
+  transition:color .2s ease, border-color .2s ease; }
+.t-replay:hover { color:var(--gold-hi); border-color:rgba(224,168,96,.4); }
+.t-replay:focus-visible { outline:none; box-shadow:0 0 0 2px rgba(246,200,119,.5); }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+/* ═══ The running totals — a ledger, not a metrics banner ═══ */
+.ledger { margin-top:64px; border-top:1px solid rgba(255,244,230,.1); padding-top:26px; }
+.ledger-cap { font-family:var(--serif); font-style:italic; font-weight:300; font-size:.95rem; color:var(--ink-muted); margin-bottom:26px; }
+.ledger-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:26px 34px; }
+.led { display:flex; flex-direction:column; gap:5px; }
+.led .lv { font-family:var(--serif); font-weight:400; font-size:clamp(1.9rem,3.4vw,2.5rem); line-height:1; color:var(--ink); font-variant-numeric:tabular-nums; }
+.led .lv.zero { color:#f2c67d; }
+.led .lk { font-size:.82rem; color:var(--ink); }
+.led .ls { font-size:.68rem; color:var(--ink-muted); }
 
 /* Modelproof "buy zone" — price vs capability scatter (real data, labels-free = neutral) */
 .buyzone { border-radius:16px; padding:22px 24px; background:rgba(9,7,13,.55); border:1px solid rgba(255,246,232,.08); }
@@ -323,9 +403,15 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .buyzone .plot { position:relative; margin:14px 0 4px; }
 .buyzone svg { display:block; width:100%; height:auto; overflow:visible; }
 .buyzone .zone { fill:rgba(240,190,90,.06); stroke:rgba(240,190,90,.28); stroke-width:1; stroke-dasharray:3 3; }
-.buyzone .dot { fill:rgba(226,180,120,.4); }
+.buyzone .dot { fill:rgba(226,180,120,.4); transform-box:fill-box; transform-origin:center;
+  transition:transform .45s cubic-bezier(.22,1,.36,1), fill .25s ease;
+  transition:transform .55s var(--spring-pop), fill .25s ease; }
+@media (hover:hover) and (pointer:fine) {
+  .buyzone .dot:hover { transform:scale(2.2); fill:#fff1cf; }
+}
 .buyzone .dot.hl { fill:#fff1cf; }
-.buyzone .ring { fill:none; stroke:#f0be5a; stroke-width:1.2; opacity:.85; }
+.buyzone .ring { fill:none; stroke:#f0be5a; stroke-width:1.2; opacity:.85; transform-box:fill-box; transform-origin:center; animation:ringpulse 3.2s ease-in-out infinite; }
+@keyframes ringpulse { 0%,100% { transform:scale(1); opacity:.85; } 50% { transform:scale(1.35); opacity:.35; } }
 .buyzone .zlab { font-family:var(--sans); font-size:8px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; fill:var(--gold-hi); }
 .buyzone .ax { display:flex; justify-content:space-between; font-size:.64rem; color:var(--ink-faint); }
 .buyzone .foot { font-size:.66rem; color:var(--ink-faint); margin-top:12px; }
@@ -335,6 +421,7 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .proj-card {
   padding: 28px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 16px;
   transition: border-color .22s, transform .22s, box-shadow .22s;
+  transition: border-color .22s, transform .5s var(--spring-soft), box-shadow .3s ease;
 }
 .proj-card:hover { border-color:rgba(176,157,107,.38); transform:translateY(-2px); box-shadow:0 18px 52px rgba(0,0,0,.5), inset 0 1px 0 rgba(202,183,125,.12); }
 .proj-header { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
@@ -388,11 +475,21 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 footer { padding: 48px 0 64px; text-align: center; color: var(--ink-faint); font-size: .78rem; border-top: 1px solid rgba(255,255,255,.04); }
 footer a { color: var(--gold-mid); }
 
+.proj-header .alias { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.72rem; color:var(--ink-muted); }
+
+/* ══════════ REDUCED MOTION — every new interaction has a calm fallback ══════════ */
+@media (prefers-reduced-motion:reduce) {
+  .bp-knob, .bp-mass, .rc-body, .buyzone .dot, .proj-card, .wr .w { transition:none; }
+  .buyzone .ring, html.js .stamp-in .grade-stamp, html.js .dcols.rise i, .term .caret { animation:none; }
+  .term .caret { opacity:.6; }
+}
+
 /* ══════════════════════ RESPONSIVE ══════════════════════ */
 @media (max-width:480px) {
   .wrap { padding: 0 16px; }
   .proj-card { padding: 20px; }
   .bio { padding: 24px 22px; font-size: 1rem; }
+  .rc-dim { min-width:0; }
 }
 </style>
 </head>
@@ -414,7 +511,10 @@ footer a { color: var(--gold-mid); }
 
 <!-- ══════════════════════════════════════════════ HERO (coastline) -->
 <header class="coast-hero" id="top">
-  <img class="hero-img" src="assets/hero/coast-web.jpg" alt="Golden-hour view from a wildflower hilltop over a curving beach — a couple and their dog walk the shore, a small plane rests on the bluff, and three crosses stand on the far headland" fetchpriority="high" decoding="async">
+  <picture>
+    <source srcset="assets/hero/coast-web.webp" type="image/webp">
+    <img class="hero-img" src="assets/hero/coast-web.jpg" alt="Golden-hour view from a wildflower hilltop over a curving beach — a couple and their dog walk the shore, a small plane rests on the bluff, and three crosses stand on the far headland" fetchpriority="high" decoding="async">
+  </picture>
   <div class="hero-grade" aria-hidden="true"></div>
   <div class="hero-seam" aria-hidden="true"></div>
   <div class="hero-scrim" aria-hidden="true"></div>
@@ -435,8 +535,8 @@ footer a { color: var(--gold-mid); }
 <section id="projects" class="layer">
   <div class="wrap">
     <span class="eyebrow fade-up">Projects</span>
-    <h2 class="fade-up">Things I've built</h2>
-    <p class="section-intro fade-up">Two flagships lead the work — <b style="color:var(--ink);font-weight:600">Modelproof</b> and <b style="color:var(--ink);font-weight:600">DATproof</b>, siblings built on one rule: every number is sourced, nothing is guessed. Around them: a developer tool that ships on npm, a full-stack app I built to learn on, and a few earlier finance prototypes.</p>
+    <h2 class="wr">Things I've built</h2>
+    <p class="section-intro fade-up">Two flagships lead the work — <b style="color:var(--ink);font-weight:600">Modelproof</b> and <b style="color:var(--ink);font-weight:600">DATproof</b>, siblings built on one rule: every number is sourced, nothing is guessed. Around them: a rating agency for Claude skills in the lab, a Supabase security scanner headed to npm, and the full-stack app that taught me the ropes. Every card below is alive — poke it.</p>
 
     <!-- ── Modelproof — FLAGSHIP (leads; sibling to DATproof) ── -->
     <div class="flagship fade-up">
@@ -502,11 +602,11 @@ footer a { color: var(--gold-mid); }
         <div class="flag-copy">
           <span class="flag-eyebrow"><span class="live"></span>Flagship · Live · rebuilt nightly</span>
           <h3>DATproof</h3>
-          <p class="lead">The verification layer for bitcoin treasury companies. It checks how much of the BTC public companies say they hold you can actually prove on-chain.</p>
+          <p class="lead">The rating agency for bitcoin-treasury proof. Ten public companies say they hold over a million BTC; DATproof tracks how much of that anyone can actually prove — and grades the evidence the way an auditor would.</p>
           <ul class="flag-points">
-            <li><b>Verification over trust.</b> Every figure carries a source and an as-of date — unverifiable ones show up blank, never guessed.</li>
-            <li><b>It runs itself.</b> A nightly GitHub Action re-checks the chain and rebuilds the site — no hands.</li>
-            <li><b>Real disclosures only.</b> 8-K filings, on-chain reconciliation. Not vibes.</li>
+            <li><b>Grades, not vibes.</b> Every major corporate holder is scored on the evidence behind its coins — disclosure quality, staleness, attestations, leverage. A–F letter grades ship next, methodology public so anyone can re-run the math.</li>
+            <li><b>Pro-adoption, not gotcha.</b> The thesis: provable, well-managed bitcoin on the balance sheet is treasury done right. A high grade is a badge — and today, the A column is empty.</li>
+            <li><b>It runs itself.</b> A GitHub Action re-checks the chain and publishes a fresh brief every morning — 19 straight mornings and counting, no hands.</li>
           </ul>
           <div class="chips" style="margin-top:18px">
             <span class="chip">Python</span><span class="chip">On-chain data</span><span class="chip">GitHub Actions</span><span class="chip">Static site</span>
@@ -518,51 +618,94 @@ footer a { color: var(--gold-mid); }
           </div>
         </div>
 
-        <div class="proofstat" aria-label="1.1 million BTC disclosed, 0% verifiable on-chain">
-          <div class="heads">
-            <div class="disclosed"><div class="num">1.1M</div><div class="k">BTC disclosed ·<br>10 biggest holders</div></div>
-            <div class="zero"><div class="num">0%</div><div class="k">verifiable<br>on-chain</div></div>
+        <div class="burden" id="burden">
+          <div class="lab"><span>The burden of proof</span><b>10 companies</b></div>
+          <div class="bp-toggle" role="switch" aria-checked="false" tabindex="0" aria-label="Require on-chain proof instead of taking companies at their word">
+            <span class="bp-opt bp-word">Take their word</span>
+            <span class="bp-opt bp-proof">Require proof</span>
+            <span class="bp-knob" aria-hidden="true"></span>
           </div>
-          <div class="pmeter">
-            <div class="track"><div class="mass"></div><div class="lit"></div></div>
-            <div class="cap"><span>0 of <b>1,100,000&nbsp;BTC</b> provable today</span><span>rebuilt nightly</span></div>
+          <div class="bp-fig"><span class="bp-num" id="bpNum">1,095,249</span><span class="bp-unit">BTC</span></div>
+          <div class="bp-caps" aria-live="polite">
+            <span class="c1">disclosed in filings and dashboards — <b>at their word</b></span>
+            <span class="c2">provable on-chain today — <b>no one publishes addresses</b></span>
           </div>
+          <div class="bp-track" aria-hidden="true"><div class="bp-mass"></div></div>
+          <div class="bp-foot">Flip it. An <b>A grade</b> requires published, reconciled addresses — the column is still empty.</div>
         </div>
       </div>
     </div>
 
-    <!-- ── rls-guard ── -->
+    <!-- ── Skillproof — in the lab ── -->
     <div class="proj-card glass fade-up">
       <div class="pcard-grid">
         <div class="pcard-copy">
           <div class="proj-header">
-            <h3>rls-guard</h3>
-            <span class="badge badge-pub">📦 Published on npm</span>
+            <h3>Skillproof</h3>
+            <span class="badge badge-wip">🧪 In the lab</span>
           </div>
           <p class="proj-desc">
-            An MCP server you point at your own Supabase project. It tells you, in plain English, which tables the public key can read — then hands you the exact SQL to lock each one down. No dashboard, no sign-up; your AI assistant just runs it.
+            The rating agency for Claude skills. Thousands of community skills exist; directories count them, nobody grades them. Skillproof installs each one, probes it in real sessions, and grades it A–F against a published rubric — with a filled worksheet behind every grade.
           </p>
           <ul class="proj-points">
-            <li><strong>It ships where agents find it.</strong> Agents discover it in MCP registries and suggest installing it — the new app store for dev tools.</li>
-            <li><strong>Built from real work.</strong> It knows an accidentally-public table from a deliberately-public one — straight out of the Supabase RLS I wrote by hand for Prompt Emporium.</li>
+            <li><strong>Receipts, not stars.</strong> Five graded dimensions, five trigger probes in fresh sessions, the skill's headline job run against a control — and a validator that re-derives every grade and fails the build on any mismatch.</li>
+            <li><strong>No placeholder grades, ever.</strong> The index starts small because every entry costs a real grading run. First seeds graded July 2026; target: 25.</li>
           </ul>
           <div class="chips">
-            <span class="chip">TypeScript</span><span class="chip">MCP SDK</span><span class="chip">npm</span><span class="chip">PostgREST</span><span class="chip">Node.js</span>
+            <span class="chip">Static site</span><span class="chip">Claude Code</span><span class="chip">A–F rubric</span><span class="chip">MIT</span>
           </div>
-          <div class="proj-links">
-            <a class="proj-link" href="https://github.com/lucascashwell3-ai" target="_blank" rel="noopener">GitHub ↗</a>
-            <a class="proj-link" href="https://npmjs.com/package/rls-guard-mcp" target="_blank" rel="noopener">npm ↗</a>
+          <p class="proj-desc" style="font-size:.78rem;color:var(--ink-muted)">Private while the index grows — public launch soon.</p>
+        </div>
+        <div class="pviz receipt">
+          <div class="lab"><span>First graded entry</span><b>rubric v1.0</b></div>
+          <div class="rc-head">
+            <span class="grade-stamp" aria-hidden="true">A</span>
+            <div class="rc-id">
+              <span class="rc-name">i-have-adhd</span>
+              <span class="rc-sub">output style · graded 2026-07-21</span>
+            </div>
+            <button class="rc-btn" type="button" aria-expanded="false" aria-controls="rcBody">receipts</button>
+          </div>
+          <div class="rc-body" id="rcBody">
+            <div class="rc-inner">
+              <div class="rc-row"><span class="rc-dim">triggering</span><span class="rc-dots" aria-label="4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="rc-note">5/5 probes — fires only on its /command, silent otherwise</span></div>
+              <div class="rc-row"><span class="rc-dim">effectiveness ×2</span><span class="rc-dots" aria-label="4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="rc-note">beat the control run: action-first, numbered, time-boxed</span></div>
+              <div class="rc-row"><span class="rc-dim">docs &amp; install</span><span class="rc-dots" aria-label="4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="rc-note">installed first try; a model for opt-in docs</span></div>
+              <div class="rc-row"><span class="rc-dim">maintenance</span><span class="rc-dots" aria-label="4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="rc-note">commits merged the day of grading</span></div>
+              <div class="rc-row"><span class="rc-dim">safety</span><span class="rc-dots" aria-label="4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="rc-note">pure markdown — no scripts, no network, nothing it can touch</span></div>
+            </div>
+          </div>
+          <div class="foot" style="font-size:.66rem;color:var(--ink-muted);margin-top:13px">Every grade links to the worksheet that produced it.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Warden (rls-guard) — heading to npm ── -->
+    <div class="proj-card glass fade-up">
+      <div class="pcard-grid">
+        <div class="pcard-copy">
+          <div class="proj-header">
+            <h3>Warden</h3>
+            <span class="alias">rls-guard-mcp</span>
+            <span class="badge badge-wip">📦 npm launch imminent</span>
+          </div>
+          <p class="proj-desc">
+            A ship-readiness check for your Supabase backend. Point it at your own project and it tells you, in plain language, which tables anyone on the internet can already read or write — then hands you the exact SQL to lock each one down. No dashboard, no sign-up; your AI assistant runs it over MCP.
+          </p>
+          <ul class="proj-points">
+            <li><strong>Severity that doesn't cry wolf.</strong> A table that's meant to be public reads as public-by-design; a table leaking emails reads as critical. Weighted by what's actually exposed.</li>
+            <li><strong>Built from real work.</strong> It knows an accidentally-public table from a deliberately-public one — straight out of the Supabase RLS I wrote by hand for Prompt Emporium.</li>
+            <li><strong>19/19 tests green</strong> on Node's built-in test runner — run before every publish.</li>
+          </ul>
+          <div class="chips">
+            <span class="chip">TypeScript</span><span class="chip">MCP SDK</span><span class="chip">PostgREST</span><span class="chip">Node.js</span><span class="chip">npx rls-guard-mcp · soon</span>
           </div>
         </div>
-        <div class="pviz">
-          <div class="scan">
-            <div class="lab"><span>Supabase RLS scan</span><b>2 exposed</b></div>
-            <div class="row"><span class="t">profiles</span><span class="st safe">🔒 protected</span></div>
-            <div class="row"><span class="t">orders</span><span class="st open">⚠ public read</span></div>
-            <div class="row"><span class="t">api_keys</span><span class="st open">⚠ public read</span></div>
-            <div class="row"><span class="t">audit_log</span><span class="st safe">🔒 protected</span></div>
-            <div class="fix"><span class="c">-- fix, ready to paste</span><br>alter table orders enable row level security;</div>
-          </div>
+        <div class="pviz term">
+          <div class="tbar" aria-hidden="true"><i></i><i></i><i></i><span>ship-readiness check</span></div>
+          <pre class="tout" id="termOut" aria-hidden="true"></pre>
+          <p class="sr-only">Example scan output: one critical finding — table public.profiles is readable by the public anon key with 1,204 rows visible including emails. Seven tables are locked down. Suggested fix: alter table public.profiles enable row level security.</p>
+          <button class="t-replay" type="button" aria-label="Replay the example scan">↺ replay scan</button>
         </div>
       </div>
     </div>
@@ -573,10 +716,10 @@ footer a { color: var(--gold-mid); }
         <div class="pcard-copy">
           <div class="proj-header">
             <h3>Prompt Emporium</h3>
-            <span class="badge badge-proto">📦 Archived</span>
+            <span class="badge badge-proto">🌇 Shipped · sunset</span>
           </div>
           <p class="proj-desc">
-            The project I built to teach myself full-stack. A web app for storing, versioning, and AI-improving prompts and Claude skills — auth, payments, a community library, the whole thing. Tabled now — but it's where most of my hard-won lessons came from.
+            My first full-stack product — a web app for storing, versioning, and AI-improving prompts. I shipped the whole thing: auth, Stripe payments, a community library. It didn't find an audience, and that's fine — it's where most of my hard-won lessons came from, and its hand-written security rules became Warden.
           </p>
           <ul class="proj-points">
             <li><strong>My first full-stack build.</strong> Next.js, Supabase (auth + Postgres + RLS), Stripe, Vercel — all wired up from scratch.</li>
@@ -588,11 +731,11 @@ footer a { color: var(--gold-mid); }
           </div>
         </div>
         <div class="pviz">
-          <div class="lab"><span>Prompt versions</span><b>v1 → vN</b></div>
+          <div class="lab"><span>Shipped → learned</span><b>v1 → vN</b></div>
           <div class="dcols" aria-hidden="true">
-            <i style="--h:30%"></i><i style="--h:46%"></i><i style="--h:40%"></i><i style="--h:60%"></i><i style="--h:54%"></i><i style="--h:76%"></i><i style="--h:68%"></i><i style="--h:94%"></i>
+            <i style="--h:30%;--d:0"></i><i style="--h:46%;--d:1"></i><i style="--h:40%;--d:2"></i><i style="--h:60%;--d:3"></i><i style="--h:54%;--d:4"></i><i style="--h:76%;--d:5"></i><i style="--h:68%;--d:6"></i><i style="--h:94%;--d:7"></i>
           </div>
-          <div class="foot">Each prompt versioned + AI-improved over time</div>
+          <div class="foot">Every version taught something — the lessons shipped elsewhere</div>
         </div>
       </div>
     </div>
@@ -637,6 +780,17 @@ footer a { color: var(--gold-mid); }
       </div>
     </div>
 
+    <!-- ── The running totals — every number below is pulled from the repos ── -->
+    <div class="ledger fade-up" aria-label="Running totals across the projects, each with its source">
+      <div class="ledger-cap">The running totals — every one sourced, none guessed.</div>
+      <div class="ledger-grid">
+        <div class="led"><span class="lv" data-count="1095249">1,095,249</span><span class="lk">BTC under watch</span><span class="ls">DATproof · 10-company registry</span></div>
+        <div class="led"><span class="lv" data-count="21">21</span><span class="lk">AI models tracked</span><span class="ls">Modelproof · 9 vendors, pricing verified</span></div>
+        <div class="led"><span class="lv" data-count="19">19</span><span class="lk">daily briefs, zero hands</span><span class="ls">DATproof · every morning since Jul 5</span></div>
+        <div class="led"><span class="lv zero" data-count="0">0</span><span class="lk">numbers guessed</span><span class="ls">house rule · a blank beats a guess</span></div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -644,7 +798,7 @@ footer a { color: var(--gold-mid); }
 <section id="background" class="layer">
   <div class="wrap">
     <span class="eyebrow fade-up">About</span>
-    <h2 class="fade-up">A little about me</h2>
+    <h2 class="wr">A little about me</h2>
 
     <div class="bio glass fade-up">
       I work in professional services, specializing in finance and SOX.
@@ -694,6 +848,9 @@ footer a { color: var(--gold-mid); }
 
 <!-- ══════════════════════════════════════════════ SCRIPTS -->
 <script>
+/* JS gate — reveal animations only ever hide content when JS is actually running */
+document.documentElement.classList.add('js');
+
 /* Year */
 document.getElementById('yr').textContent = new Date().getFullYear();
 
@@ -906,6 +1063,139 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
 })();
 
+/* ═══ Projects showcase — micro-interactions (all reduced-motion aware) ═══ */
+(function(){
+  const RM = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const io = (el, fn, threshold) => {                    // one-shot IntersectionObserver helper
+    const o = new IntersectionObserver(es=>es.forEach(e=>{
+      if(e.isIntersecting){ fn(e.target); o.unobserve(e.target); }
+    }),{threshold: threshold==null?0.35:threshold});
+    o.observe(el);
+  };
+
+  /* 1 · Staggered word reveal on section headings */
+  document.querySelectorAll('.wr').forEach(h=>{
+    if(RM) return;
+    const words = h.textContent.trim().split(/\s+/);
+    h.textContent = '';
+    words.forEach((w,i)=>{
+      const s=document.createElement('span'); s.className='w'; s.style.setProperty('--wi',i); s.textContent=w;
+      h.appendChild(s);
+      if(i<words.length-1) h.appendChild(document.createTextNode(' '));
+    });
+    io(h, el=>el.classList.add('visible'), 0.6);
+  });
+
+  /* 2 · Count-up ledger (markup ships final values; JS rewinds then counts) */
+  const fmt = n => Math.round(n).toLocaleString('en-US');
+  function countUp(el){
+    const target = +el.dataset.count;
+    const t0 = performance.now(), dur = 1300;
+    (function tick(t){
+      const p = Math.min((t-t0)/dur, 1), e = 1-Math.pow(1-p,5);   // ease-out-quint
+      el.textContent = fmt(target*e);
+      if(p<1) requestAnimationFrame(tick); else el.textContent = fmt(target);
+    })(t0);
+  }
+  document.querySelectorAll('.lv[data-count]').forEach(el=>{
+    if(RM) return;                                        // reduced motion: final values stay as shipped
+    el.textContent = '0';
+    io(el, countUp, 0.6);
+  });
+
+  /* 3 · DATproof — the burden-of-proof flip */
+  const burden = document.getElementById('burden'), bpNum = document.getElementById('bpNum');
+  if(burden && bpNum){
+    const DISCLOSED = 1095249;
+    let raf = null;
+    function rollTo(target){
+      if(raf) cancelAnimationFrame(raf);
+      if(RM){ bpNum.textContent = fmt(target); return; }
+      const from = parseInt(bpNum.textContent.replace(/,/g,''),10) || 0;
+      const t0 = performance.now(), dur = 850;
+      (function tick(t){
+        const p = Math.min((t-t0)/dur,1), e = 1-Math.pow(1-p,4);
+        bpNum.textContent = fmt(from+(target-from)*e);
+        raf = p<1 ? requestAnimationFrame(tick) : null;
+      })(t0);
+    }
+    const toggle = burden.querySelector('.bp-toggle');
+    function flip(){
+      const proof = burden.classList.toggle('proof');
+      toggle.setAttribute('aria-checked', String(proof));
+      rollTo(proof ? 0 : DISCLOSED);
+    }
+    toggle.addEventListener('click', flip);
+    toggle.addEventListener('keydown', e=>{
+      if(e.key===' '||e.key==='Enter'){ e.preventDefault(); flip(); }
+    });
+  }
+
+  /* 4 · Skillproof — grade stamp entrance + receipt reveal */
+  const receipt = document.querySelector('.receipt');
+  if(receipt){
+    if(!RM) io(receipt, el=>el.classList.add('stamp-in'), 0.45);
+    const btn = receipt.querySelector('.rc-btn');
+    if(btn) btn.addEventListener('click', ()=>{
+      const open = receipt.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'fold' : 'receipts';
+    });
+  }
+
+  /* 5 · Prompt Emporium — version columns rise in */
+  document.querySelectorAll('.dcols').forEach(d=>{
+    if(!RM) io(d, el=>el.classList.add('rise'), 0.5);
+  });
+
+  /* 6 · Warden — terminal scan that types out real findings */
+  const tout = document.getElementById('termOut');
+  if(tout){
+    const LINES = [
+      { t:'$ npx rls-guard-mcp', c:'dim' },
+      { t:'rls-guard — Supabase ship-readiness check', c:'gold' },
+      { t:'scanning 8 tables with the public anon key…', c:'dim' },
+      { t:'' },
+      { t:'CRITICAL  public.profiles — 1,204 rows visible', c:'crit' },
+      { t:'          sensitive: email (PII) · stripe_customer_id', c:'crit' },
+      { t:'ok        7 tables locked down', c:'ok' },
+      { t:'' },
+      { t:'-- fix, ready to paste', c:'dim' },
+      { t:'alter table "public"."profiles"', c:'gold' },
+      { t:'  enable row level security;', c:'gold' }
+    ];
+    let gen = 0;                                          // generation token — a replay orphans any older typing chain
+    function renderInstant(){
+      tout.textContent='';
+      LINES.forEach(l=>{
+        const s=document.createElement('span'); if(l.c) s.className=l.c;
+        s.textContent=l.t+'\n'; tout.appendChild(s);
+      });
+    }
+    function type(){
+      if(RM){ renderInstant(); return; }
+      const g = ++gen;
+      tout.textContent='';
+      const caret=document.createElement('span'); caret.className='caret';
+      tout.appendChild(caret);
+      let li=0, ci=0, cur=null;
+      function step(){
+        if(g!==gen || li>=LINES.length) return;
+        const line=LINES[li];
+        if(!cur){ cur=document.createElement('span'); if(line.c) cur.className=line.c; tout.insertBefore(cur,caret); }
+        cur.textContent += line.t.slice(ci, ci+2); ci += 2;   // 2 chars/step ≈ readable + quick
+        if(ci>=line.t.length){
+          cur.textContent += '\n'; cur=null; ci=0; li++;
+          setTimeout(step, line.t===''?40:110);               // beat between lines
+        } else setTimeout(step, 16);
+      }
+      step();
+    }
+    io(tout.closest('.term'), type, 0.45);
+    const replay = document.querySelector('.t-replay');
+    if(replay) replay.addEventListener('click', type);
+  }
+})();
 
 </script>
 </body>
