@@ -56,21 +56,28 @@ fs.mkdirSync(OUT, { recursive: true });
   await page.screenshot({ path: OUT + '/2-cruise.png' });
   console.log('cruise state:', await page.evaluate(() => window.__cessna.state));
 
-  // 3. mid-flight to a project — fly to DATproof, capture mid-transit (banking)
+  // 3. mid-flight to a project — short hop to Modelproof: the island sits in the
+  //    windshield during the bank (the DATproof route hides its isle under the nose)
   await page.evaluate(() => {
     const c = window.__cessna;
-    c.setLook(0, -0.04);      // eyes forward over the nose for the banking shot
-    c.flyTo('datproof');
-    c.ff(3.4);
+    // restage: west side of the cruise orbit heading north — the turn to Beacon Point
+    // puts the island right in the windshield
+    c.S.theta = Math.PI; c.S.heading = 0;
+    c.ff(1.5);
+    c.setLook(0, -0.12);      // eyes over the nose, slightly down
+    c.flyTo('modelproof');
+    c.ff(2.5);
   });
   await settle(400);
   await page.screenshot({ path: OUT + '/3-transit.png' });
   console.log('transit state:', await page.evaluate(() => window.__cessna.state),
               'roll:', await page.evaluate(() => window.__cessna.S.roll.toFixed(2)));
 
-  // 4. project card open — finish the transit, orbiting the island
+  // 4. project card open — redirect to the flagship, ride the tween into orbit
   const after9 = await page.evaluate(() => {
-    window.__cessna.ff(9);
+    window.__cessna.setLook(0, 0);
+    window.__cessna.flyTo('datproof');
+    window.__cessna.ff(11);
     return { mode: window.__cessna.state, tween: !!window.__cessna.S.tween,
              card: document.getElementById('card').className,
              cap: document.getElementById('caption').className };
