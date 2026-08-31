@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Proof — Lucas Cashwell</title>
-<meta name="description" content="Proof — verifiable work, not vibes. A record of what Lucas Cashwell has built, led by DATproof, the flagship." />
+<meta name="description" content="Proof — verifiable work, not vibes. A record of what Lucas Cashwell has built: DATproof, Skillproof, Modelproof, and more." />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Cg%20fill='%23f0b95f'%3E%3Crect%20x='43'%20y='28'%20width='14'%20height='44'%20rx='1.5'/%3E%3Crect%20x='28'%20y='43'%20width='44'%20height='14'%20rx='1.5'/%3E%3Crect%20x='12'%20y='12'%20width='11'%20height='11'%20rx='1.5'/%3E%3Crect%20x='77'%20y='12'%20width='11'%20height='11'%20rx='1.5'/%3E%3Crect%20x='12'%20y='77'%20width='11'%20height='11'%20rx='1.5'/%3E%3Crect%20x='77'%20y='77'%20width='11'%20height='11'%20rx='1.5'/%3E%3C/g%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -276,7 +276,7 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .mdash .spark { display:block; height:52px; }
 .mdash .foot { font-size:.62rem; color:var(--ink-faint); margin-top:11px; }
 
-/* ══════════════════════ FLAGSHIP (DATproof — the star) ══════════════════════ */
+/* ══════════════════════ LEAD PROJECT CARDS ══════════════════════ */
 .flagship { position:relative; margin-bottom:26px; padding:32px 34px; border-radius:22px;
   border:1px solid rgba(224,168,96,.30);
   background:radial-gradient(120% 130% at 100% 0%, rgba(224,168,96,.12), transparent 52%), var(--glass-bg);
@@ -295,7 +295,7 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .flag-points li b { color:var(--ink); font-weight:600; }
 .flag-links { display:flex; gap:8px; flex-wrap:wrap; margin-top:22px; }
 
-/* the dithered "proof stat" — 1.1M disclosed → 0% verifiable */
+/* project stat panel */
 .proofstat { border-radius:16px; padding:24px; background:rgba(9,7,13,.55); border:1px solid rgba(255,246,232,.08); }
 .proofstat .heads { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
 .proofstat .num { font-family:var(--serif); font-weight:400; line-height:.86; }
@@ -315,7 +315,7 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .pmeter .cap { margin-top:11px; font-size:.75rem; color:var(--ink-muted); display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
 .pmeter .cap b { color:var(--ink); font-weight:600; }
 
-/* Modelproof "buy zone" — price vs capability scatter (real data, labels-free = neutral) */
+/* Modelproof buy-zone scatter */
 .buyzone { border-radius:16px; padding:22px 24px; background:rgba(9,7,13,.55); border:1px solid rgba(255,246,232,.08); }
 .buyzone .bz-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
 .buyzone .bz-head .t { font-family:var(--sans); font-size:.6rem; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint); }
@@ -330,6 +330,32 @@ section > .wrap > h2 { font-size: clamp(1.7rem, 3.5vw, 2.2rem); font-weight: 400
 .buyzone .ax { display:flex; justify-content:space-between; font-size:.64rem; color:var(--ink-faint); }
 .buyzone .foot { font-size:.66rem; color:var(--ink-faint); margin-top:12px; }
 .buyzone .foot b { color:var(--ink); font-weight:600; }
+
+/* DATproof activity grid */
+.actgrid { margin-top:22px; }
+.actgrid .lab { margin-bottom:10px; }
+.actgrid .lab .t { font-family:var(--sans); font-size:.6rem; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint); }
+.actgrid svg { display:block; width:100%; height:auto; }
+.actgrid rect.off { fill:rgba(255,246,232,.05); }
+.actgrid rect.on { fill:#e8b366; }
+.actgrid .cap { margin-top:11px; font-size:.7rem; color:var(--ink-faint); display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+
+/* Skillproof terminal — the one-conversation install, compressed */
+.skillterm { border-radius:16px; background:rgba(9,7,13,.72); border:1px solid rgba(255,246,232,.08); overflow:hidden; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.74rem; line-height:1.9; }
+.skillterm .bar { display:flex; align-items:center; gap:6px; padding:10px 14px; background:rgba(255,246,232,.04); border-bottom:1px solid rgba(255,246,232,.06); }
+.skillterm .bar i { width:8px; height:8px; border-radius:50%; background:rgba(255,246,232,.14); }
+.skillterm .bar .ttl { margin-left:6px; font-family:var(--sans); font-size:.62rem; font-weight:600; letter-spacing:.08em; color:var(--ink-faint); }
+.skillterm .body { padding:16px 18px 18px; color:var(--ink-muted); }
+.skillterm .u { color:var(--ink); }
+.skillterm .g { color:#8fd6a8; }
+.skillterm .gold { color:var(--gold-hi); }
+
+
+/* email copied toast */
+.toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,16px);background:rgba(15,13,20,.92);border:1px solid rgba(202,183,125,.45);color:var(--ink);font-size:.85rem;padding:11px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s cubic-bezier(.22,1,.36,1);z-index:60;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast b{color:var(--gold-hi);font-weight:600}
+@media (prefers-reduced-motion:reduce){.toast{transition:opacity .2s ease;transform:translate(-50%,0)}}
 
 /* ══════════════════════ PROJECT CARDS ══════════════════════ */
 .proj-card {
@@ -423,7 +449,7 @@ footer a { color: var(--gold-mid); }
   <div class="coast-hero__inner">
     <span class="eyebrow form-in">Portfolio · Lucas Cashwell</span>
     <h1 class="wordmark form-in d1">Proof</h1>
-    <p class="tagline form-in d2"><b>Everything I've actually built — led by Modelproof and DATproof, my flagships.</b></p>
+    <p class="tagline form-in d2"><b>Everything I've actually built — led by DATproof, Skillproof, and Modelproof.</b></p>
     <div class="cta-row form-in d3">
       <a class="btn-primary" href="#projects">See the proof <span aria-hidden="true">→</span></a>
       <a class="btn-ghost" href="#contact">Say hello</a>
@@ -436,22 +462,170 @@ footer a { color: var(--gold-mid); }
   <div class="wrap">
     <span class="eyebrow fade-up">Projects</span>
     <h2 class="fade-up">Things I've built</h2>
-    <p class="section-intro fade-up">Two flagships lead the work — <b style="color:var(--ink);font-weight:600">Modelproof</b> and <b style="color:var(--ink);font-weight:600">DATproof</b>, siblings built on one rule: every number is sourced, nothing is guessed. Around them: a developer tool that ships on npm, a full-stack app I built to learn on, and a few earlier finance prototypes.</p>
+    <p class="section-intro fade-up">Three builds lead the work — <b style="color:var(--ink);font-weight:600">DATproof</b>, <b style="color:var(--ink);font-weight:600">Skillproof</b>, and <b style="color:var(--ink);font-weight:600">Modelproof</b>. Around them: a developer tool that ships on npm, a full-stack app I built to learn on, and a few earlier finance prototypes.</p>
 
-    <!-- ── Modelproof — FLAGSHIP (leads; sibling to DATproof) ── -->
+    <!-- ── DATproof ── -->
     <div class="flagship fade-up">
       <div class="flag-grid">
         <div class="flag-copy">
-          <span class="flag-eyebrow"><span class="live"></span>Flagship · Live · independent</span>
-          <h3>Modelproof</h3>
-          <p class="lead">Which AI model should you actually use? A calm decision tool — tell it your task, or the lab you already pay for, and get a straight answer. Not a benchmark race; the point is the decision.</p>
+          <span class="flag-eyebrow"><span class="live"></span>Live · rebuilt daily</span>
+          <h3>DATproof</h3>
+          <p class="lead">DATproof is an adoption accelerator for digital asset treasuries — an information hub for corporate Bitcoin purchase data.</p>
           <ul class="flag-points">
-            <li><b>Two ways in.</b> Pick by task — what you're doing, and how you weigh cost vs. quality — or by lab, if you're already locked into one. You get a top pick plus runners-up, in plain English.</li>
-            <li><b>Sourced, never guessed.</b> Pricing is verified against vendor pages, every benchmark carries a confidence flag, and a blank means "not reliably sourced" — the same discipline as DATproof.</li>
-            <li><b>Independent.</b> Not sponsored by, or advertising for, any lab — models are ranked on merit and cost only.</li>
+            <li><b>The record.</b> Corporate Bitcoin purchases, and the raises that fund them, straight from company disclosures.</li>
+            <li><b>Always current.</b> The site rebuilds itself from the filings every day.</li>
+            <li><b>The credit side too.</b> STRC and SATA — digital credit — tracked alongside the buys.</li>
           </ul>
           <div class="chips" style="margin-top:18px">
-            <span class="chip">Vanilla JS</span><span class="chip">Client-side</span><span class="chip">21 models · 9 vendors</span><span class="chip">Static site</span>
+            <span class="chip">Python</span><span class="chip">SEC filings</span><span class="chip">GitHub Actions</span><span class="chip">Static site</span>
+          </div>
+          <div class="flag-links">
+            <a class="proj-link" href="https://lucascashwell3-ai.github.io/datproof/" target="_blank" rel="noopener">Live site ↗</a>
+            <a class="proj-link" href="https://github.com/lucascashwell3-ai/datproof" target="_blank" rel="noopener">GitHub ↗</a>
+          </div>
+        </div>
+
+        <div class="proofstat" aria-label="848,986 BTC bought across 180 filed buys; 56.2 billion dollars raised across 184 at-the-market sales">
+          <div class="heads">
+            <div class="disclosed"><div class="num">$56.2B</div><div class="k">raised at the market ·<br>184 filed sales</div></div>
+            <div class="zero"><div class="num">848,986</div><div class="k">BTC bought · 180 filed buys<br>as of Aug 2026</div></div>
+          </div>
+          <div class="actgrid" aria-hidden="true">
+            <div class="lab"><span class="t">Buy weeks · last 26 · MSTR / Strive / Metaplanet</span></div>
+            <svg viewBox="0 0 309 33" preserveAspectRatio="xMidYMid meet" role="img">
+              <rect class="on" x="0" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="12" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="24" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="36" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="48" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="60" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="72" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="84" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="96" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="108" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="120" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="132" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="144" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="156" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="168" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="180" y="0" width="9" height="9" rx="2"/>
+              <rect class="on" x="192" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="204" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="216" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="228" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="240" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="252" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="264" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="276" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="288" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="300" y="0" width="9" height="9" rx="2"/>
+              <rect class="off" x="0" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="12" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="24" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="36" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="48" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="60" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="72" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="84" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="96" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="108" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="120" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="132" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="144" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="156" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="168" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="180" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="192" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="204" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="216" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="228" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="240" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="252" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="264" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="276" y="12" width="9" height="9" rx="2"/>
+              <rect class="on" x="288" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="300" y="12" width="9" height="9" rx="2"/>
+              <rect class="off" x="0" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="12" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="24" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="36" y="24" width="9" height="9" rx="2"/>
+              <rect class="on" x="48" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="60" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="72" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="84" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="96" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="108" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="120" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="132" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="144" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="156" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="168" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="180" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="192" y="24" width="9" height="9" rx="2"/>
+              <rect class="on" x="204" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="216" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="228" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="240" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="252" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="264" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="276" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="288" y="24" width="9" height="9" rx="2"/>
+              <rect class="off" x="300" y="24" width="9" height="9" rx="2"/>
+            </svg>
+            <div class="cap"><span>one row per company · lit = a week with a filed buy</span><span>rebuilt daily</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Skillproof ── -->
+    <div class="flagship fade-up">
+      <div class="flag-grid">
+        <div class="flag-copy">
+          <span class="flag-eyebrow"><span class="live"></span>Live · self-refreshing</span>
+          <h3>Skillproof</h3>
+          <p class="lead">Give your agents the skills they need. A catalog of community skills, plus a Claude Code skill that installs the right one into the setup you already have.</p>
+          <ul class="flag-points">
+            <li><b>A plan you approve.</b> It proposes what fits; you approve each part of the plan before anything changes.</li>
+            <li><b>It fits your setup.</b> It reads what you already have and integrates — it doesn't pile on.</li>
+            <li><b>It maintains itself.</b> A GitHub Action refreshes the catalog every day.</li>
+          </ul>
+          <div class="chips" style="margin-top:18px">
+            <span class="chip">Claude Code skill</span><span class="chip">MCP server</span><span class="chip">Vanilla JS</span><span class="chip">GitHub Actions</span>
+          </div>
+          <div class="flag-links">
+            <a class="proj-link" href="https://lucascashwell3-ai.github.io/Skillproof/" target="_blank" rel="noopener">Live site ↗</a>
+            <a class="proj-link" href="https://github.com/lucascashwell3-ai/Skillproof" target="_blank" rel="noopener">GitHub ↗</a>
+          </div>
+        </div>
+
+        <div class="skillterm" aria-label="A Skillproof session: one pain point in, one plan, one yes, installed and verified">
+          <div class="bar"><i></i><i></i><i></i><span class="ttl">claude — skillproof</span></div>
+          <div class="body">
+            <span class="u">&gt; my sites all look the same</span><br>
+            <span class="g">●</span> Skillproof: found 3 · best fit <span class="gold">impeccable</span><br>
+            <span class="g">●</span> one clash: your CLAUDE.md bans styling advice<br>
+            &nbsp;&nbsp;Install + soften that line? <span class="gold">› 1. Yes</span><br>
+            <span class="g">✓</span> installed · triggers verified · undo saved
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modelproof ── -->
+    <div class="flagship fade-up">
+      <div class="flag-grid">
+        <div class="flag-copy">
+          <span class="flag-eyebrow"><span class="live"></span>Live · independent</span>
+          <h3>Modelproof</h3>
+          <p class="lead">Which AI model should you actually use? A calm, independent answer, matched to your work and your budget.</p>
+          <ul class="flag-points">
+            <li><b>An advisor, not a leaderboard.</b> Neutral, cost-first, and built around the tools you already pay for.</li>
+            <li><b>Sourced.</b> Prices come from vendor pages; a blank means not verified.</li>
+            <li><b>Independent.</b> No lab sponsors it; picks are on merit and cost only.</li>
+          </ul>
+          <div class="chips" style="margin-top:18px">
+            <span class="chip">Vanilla JS</span><span class="chip">Client-side</span><span class="chip">52 models · 25 vendors</span><span class="chip">Static site</span>
           </div>
           <div class="flag-links">
             <a class="proj-link" href="https://lucascashwell3-ai.github.io/modelproof/" target="_blank" rel="noopener">Live site ↗</a>
@@ -459,8 +633,8 @@ footer a { color: var(--gold-mid); }
           </div>
         </div>
 
-        <div class="buyzone" aria-label="The buy zone: 21 AI models plotted by price versus capability; cheap and capable models sit top-left">
-          <div class="bz-head"><span class="t">The buy zone · price vs capability</span><b>21 models</b></div>
+        <div class="buyzone" aria-label="The buy zone: AI models plotted by price versus capability; cheap and capable models sit top-left">
+          <div class="bz-head"><span class="t">The buy zone · price vs capability</span><b>52 models</b></div>
           <div class="plot">
             <svg viewBox="0 0 260 150" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
               <rect class="zone" x="14" y="16" width="124" height="82" rx="6"/>
@@ -492,41 +666,6 @@ footer a { color: var(--gold-mid); }
           </div>
           <div class="ax"><span>← cheaper</span><span>pricier →</span></div>
           <div class="foot">Top-left = cheap <b>and</b> capable. Pricing verified · benchmarks flagged · blank = not sourced.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── DATproof — FLAGSHIP (sibling to Modelproof) ── -->
-    <div class="flagship fade-up">
-      <div class="flag-grid">
-        <div class="flag-copy">
-          <span class="flag-eyebrow"><span class="live"></span>Flagship · Live · rebuilt nightly</span>
-          <h3>DATproof</h3>
-          <p class="lead">The verification layer for bitcoin treasury companies. It checks how much of the BTC public companies say they hold you can actually prove on-chain.</p>
-          <ul class="flag-points">
-            <li><b>Verification over trust.</b> Every figure carries a source and an as-of date — unverifiable ones show up blank, never guessed.</li>
-            <li><b>It runs itself.</b> A nightly GitHub Action re-checks the chain and rebuilds the site — no hands.</li>
-            <li><b>Real disclosures only.</b> 8-K filings, on-chain reconciliation. Not vibes.</li>
-          </ul>
-          <div class="chips" style="margin-top:18px">
-            <span class="chip">Python</span><span class="chip">On-chain data</span><span class="chip">GitHub Actions</span><span class="chip">Static site</span>
-          </div>
-          <div class="flag-links">
-            <a class="proj-link" href="https://lucascashwell3-ai.github.io/datproof/" target="_blank" rel="noopener">Live site ↗</a>
-            <a class="proj-link" href="https://lucascashwell3-ai.github.io/datproof/tearsheet/" target="_blank" rel="noopener">Today's tearsheet ↗</a>
-            <a class="proj-link" href="https://github.com/lucascashwell3-ai/datproof" target="_blank" rel="noopener">GitHub ↗</a>
-          </div>
-        </div>
-
-        <div class="proofstat" aria-label="1.1 million BTC disclosed, 0% verifiable on-chain">
-          <div class="heads">
-            <div class="disclosed"><div class="num">1.1M</div><div class="k">BTC disclosed ·<br>10 biggest holders</div></div>
-            <div class="zero"><div class="num">0%</div><div class="k">verifiable<br>on-chain</div></div>
-          </div>
-          <div class="pmeter">
-            <div class="track"><div class="mass"></div><div class="lit"></div></div>
-            <div class="cap"><span>0 of <b>1,100,000&nbsp;BTC</b> provable today</span><span>rebuilt nightly</span></div>
-          </div>
         </div>
       </div>
     </div>
@@ -649,10 +788,10 @@ footer a { color: var(--gold-mid); }
     <div class="bio glass fade-up">
       I work in professional services, specializing in finance and SOX.
       I got tired of watching the gap between what AI could do and what people were actually doing with it.
-      So I started building on my own time, with curiosity as the only deadline.
+      So I started building on nights and weekends to see what I could actually ship.
       <br><br>
       These projects are how I learn. Some are polished, some are rough — all of them taught me something real.
-      That's what this site is: <em>the actual work, not a highlight reel.</em>
+      That's what this site is: <em>the actual work.</em>
     </div>
   </div>
 </section>
@@ -665,7 +804,7 @@ footer a { color: var(--gold-mid); }
       <h2>Say hello</h2>
       <p class="sub">Always up for talking AI, building, or whatever you're working on.</p>
       <div class="contact-links">
-        <a class="btn-primary gold-metal" href="mailto:lucascashwell3@gmail.com">
+        <a class="btn-primary gold-metal" href="mailto:lucascashwell3@gmail.com" id="email-btn">
           Email me
         </a>
         <a class="btn-ghost" href="https://www.linkedin.com/in/lucas-cashwell/" target="_blank" rel="noopener">
@@ -907,6 +1046,20 @@ document.getElementById('yr').textContent = new Date().getFullYear();
 })();
 
 
+</script>
+
+<script>
+(function(){
+  var btn=document.getElementById('email-btn'); if(!btn) return;
+  var toast=document.createElement('div'); toast.className='toast';
+  toast.innerHTML='Copied — <b>lucascashwell3@gmail.com</b>';
+  document.body.appendChild(toast); var t;
+  btn.addEventListener('click',function(){
+    try{ navigator.clipboard && navigator.clipboard.writeText('lucascashwell3@gmail.com'); }catch(e){}
+    toast.classList.add('show'); clearTimeout(t);
+    t=setTimeout(function(){ toast.classList.remove('show'); },2600);
+  });
+})();
 </script>
 </body>
 </html>
