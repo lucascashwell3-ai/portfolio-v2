@@ -1,6 +1,6 @@
 # Proof — Lucas Cashwell's portfolio
 
-**[Live site →](https://lucascashwell3-ai.github.io/portfolio-v2/)**
+**[Live site →](https://lucascashwell3-ai.github.io/proof/)**
 
 Everything I've actually built — the record, not a highlight reel.
 
